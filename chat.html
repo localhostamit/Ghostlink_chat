@@ -395,28 +395,30 @@
 
     // 3. When someone calls us (media connection)
     peer.on('call', function(incomingCall) {
-        // Auto-answer with local stream
-        navigator.mediaDevices.getUserMedia({ video: true, audio: true })
-            .then(stream => {
-                localStream = stream;
-                localVideo.srcObject = stream;
-                
-                incomingCall.answer(stream);
-                call = incomingCall;
-                
-                incomingCall.on('stream', remoteStream => {
-                    remoteVideo.srcObject = remoteStream;
-                    showVideoSection();
+        // Ask user for consent before answering
+        if (confirm('Incoming video call. Accept?')) {
+            navigator.mediaDevices.getUserMedia({ video: true, audio: true })
+                .then(stream => {
+                    localStream = stream;
+                    localVideo.srcObject = stream;
+                    
+                    incomingCall.answer(stream);
+                    call = incomingCall;
+                    
+                    incomingCall.on('stream', remoteStream => {
+                        remoteVideo.srcObject = remoteStream;
+                        showVideoSection();
+                    });
+                    
+                    incomingCall.on('close', () => {
+                        endCall();
+                    });
+                })
+                .catch(err => {
+                    console.error('Failed to get media:', err);
+                    alert('Camera/microphone access denied');
                 });
-                
-                incomingCall.on('close', () => {
-                    endCall();
-                });
-            })
-            .catch(err => {
-                console.error('Failed to get media:', err);
-                alert('Camera/microphone access denied');
-            });
+        }
     });
 
     // Connect to someone else
@@ -445,10 +447,18 @@
         
         // Handle incoming data
         conn.on('data', function(data) {
-            if (typeof data === 'object' && data.type === 'photo') {
-                addPhotoMessage(data.data, 'peer-msg');
-            } else {
+            // Validate incoming data
+            if (typeof data === 'object' && data !== null && data.type === 'photo') {
+                // Validate photo data is a data URL
+                if (typeof data.data === 'string' && data.data.startsWith('data:image/')) {
+                    addPhotoMessage(data.data, 'peer-msg');
+                } else {
+                    console.error('Invalid photo data received');
+                }
+            } else if (typeof data === 'string') {
                 addMessage(data, 'peer-msg');
+            } else {
+                console.error('Invalid data type received:', typeof data);
             }
         });
         
@@ -512,10 +522,10 @@
     function toggleMute() {
         if (!localStream) return;
         
-        const audioTrack = localStream.getAudioTracks()[0];
-        if (audioTrack) {
-            audioTrack.enabled = !audioTrack.enabled;
-            isAudioMuted = !audioTrack.enabled;
+        const audioTracks = localStream.getAudioTracks();
+        if (audioTracks.length > 0) {
+            audioTracks[0].enabled = !audioTracks[0].enabled;
+            isAudioMuted = !audioTracks[0].enabled;
             updateMuteButton();
         }
     }
@@ -523,10 +533,10 @@
     function toggleVideo() {
         if (!localStream) return;
         
-        const videoTrack = localStream.getVideoTracks()[0];
-        if (videoTrack) {
-            videoTrack.enabled = !videoTrack.enabled;
-            isVideoOff = !videoTrack.enabled;
+        const videoTracks = localStream.getVideoTracks();
+        if (videoTracks.length > 0) {
+            videoTracks[0].enabled = !videoTracks[0].enabled;
+            isVideoOff = !videoTracks[0].enabled;
             updateVideoButton();
         }
     }
@@ -553,6 +563,21 @@
         if (!file) return;
         if (!conn) return alert('Connect to a peer first!');
         
+        // Validate file type
+        if (!file.type.startsWith('image/')) {
+            alert('Please select an image file');
+            fileInput.value = '';
+            return;
+        }
+        
+        // Validate file size (max 5MB)
+        const maxSize = 5 * 1024 * 1024; // 5MB
+        if (file.size > maxSize) {
+            alert('Image is too large. Please select an image smaller than 5MB');
+            fileInput.value = '';
+            return;
+        }
+        
         const reader = new FileReader();
         reader.onload = function(e) {
             const photoData = {
@@ -575,7 +600,15 @@
         const img = document.createElement('img');
         img.src = photoDataUrl;
         img.className = 'message-img';
-        img.onclick = () => window.open(photoDataUrl, '_blank');
+        img.alt = 'Shared photo';
+        // Create blob URL for safer viewing instead of opening data URL directly
+        img.onclick = () => {
+            const link = document.createElement('a');
+            link.href = photoDataUrl;
+            link.download = 'shared-photo.jpg';
+            link.target = '_blank';
+            link.click();
+        };
         
         div.appendChild(img);
         msgDisplay.appendChild(div);
