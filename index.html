@@ -3,507 +3,435 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <title>GhostLink - Secure P2P Protocol</title>
+    <title>GhostLink | Secure P2P System</title>
     <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    
     <style>
-        /* THEME: Cyberpunk / Security Console */
+        /* --- CYBERPUNK THEME --- */
         :root {
-            --bg-color: #0d1117;
-            --card-bg: #161b22;
-            --primary: #238636; /* GitHub Green */
-            --accent: #58a6ff; /* Tech Blue */
-            --text-main: #c9d1d9;
-            --text-muted: #8b949e;
-            --border: #30363d;
-            --danger: #da3633;
+            --bg-color: #050505;       /* Pitch Black */
+            --panel-bg: #111;          /* Dark Grey */
+            --border: #333;
+            --primary: #00ff41;        /* Matrix Green */
+            --secondary: #008F11;      /* Darker Green */
+            --accent: #00b8ff;         /* Cyber Blue */
+            --danger: #ff0055;
+            --text-main: #eee;
+            --text-muted: #888;
         }
 
         * { margin:0; padding:0; box-sizing:border-box; }
+        
         body {
-            font-family: 'JetBrains Mono', 'Courier New', monospace; /* Monospace looks technical */
+            font-family: 'JetBrains Mono', monospace;
             background-color: var(--bg-color);
             color: var(--text-main);
-            min-height: 100vh;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden; /* No scroll on body, only in chat */
+        }
+
+        /* --- HEADER --- */
+        .header {
+            padding: 15px 30px;
+            border-bottom: 1px solid var(--border);
+            background: rgba(0,0,0,0.8);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .logo { font-size: 22px; font-weight: bold; color: var(--primary); letter-spacing: 2px; text-transform: uppercase; }
+        .logo span { color: var(--text-muted); font-size: 14px; margin-left: 10px; }
+        
+        .student-info { font-size: 12px; color: var(--text-muted); text-align: right; }
+        .student-name { color: var(--accent); font-weight: bold; }
+
+        /* --- MAIN LAYOUT --- */
+        .main-grid {
+            display: grid;
+            grid-template-columns: 300px 1fr; /* Sidebar | Chat Area */
+            height: calc(100vh - 60px); /* Full height minus header */
+        }
+
+        /* --- SIDEBAR (Connection) --- */
+        .sidebar {
+            background: var(--panel-bg);
+            border-right: 1px solid var(--border);
             padding: 20px;
             display: flex;
-            justify-content: center;
-            align-items: flex-start;
+            flex-direction: column;
+            gap: 20px;
         }
 
-        .container {
-            max-width: 900px;
-            width: 100%;
-            animation: fadeIn 0.8s ease-out;
-        }
-
-        @keyframes fadeIn { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:translateY(0); } }
-
-        /* HEADER */
-        .header {
-            text-align: center;
-            margin-bottom: 30px;
-            border-bottom: 1px solid var(--border);
-            padding-bottom: 20px;
-        }
-        .header h1 { color: var(--accent); font-size: 28px; text-transform: uppercase; letter-spacing: 2px; }
-        .header .badge { background: var(--border); padding: 4px 8px; border-radius: 4px; font-size: 12px; color: var(--primary); }
-
-        /* CARDS */
-        .card {
-            background: var(--card-bg);
+        .panel {
             border: 1px solid var(--border);
-            border-radius: 6px;
-            padding: 20px;
-            margin-bottom: 20px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.5);
-        }
-        .card-title {
-            color: var(--text-muted);
-            font-size: 12px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            margin-bottom: 10px;
-            border-bottom: 1px solid var(--border);
-            padding-bottom: 5px;
-        }
-
-        /* ID DISPLAY */
-        .id-display {
-            background: #000;
-            border: 1px solid var(--primary);
-            color: var(--primary);
             padding: 15px;
-            font-size: 14px;
-            word-break: break-all;
             border-radius: 4px;
-            margin: 10px 0;
-            position: relative;
+            background: #0a0a0a;
         }
-        .id-display::before { content: "> "; color: var(--text-muted); }
+        .panel-label { color: var(--text-muted); font-size: 11px; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px; display: block; }
 
-        /* INPUTS & BUTTONS */
-        input[type="text"], input[type="password"] {
-            background: #0d1117;
+        .my-id-box {
+            font-size: 32px;
+            color: var(--primary);
+            text-align: center;
+            font-weight: bold;
+            padding: 10px;
+            border: 2px dashed var(--secondary);
+            margin-bottom: 5px;
+            text-shadow: 0 0 10px rgba(0, 255, 65, 0.3);
+        }
+
+        /* Inputs & Buttons */
+        input {
+            width: 100%;
+            background: #000;
             border: 1px solid var(--border);
             color: white;
             padding: 12px;
-            width: 100%;
-            border-radius: 4px;
             font-family: inherit;
             margin-bottom: 10px;
+            text-align: center;
+            font-size: 16px;
         }
-        input:focus { outline: none; border-color: var(--accent); }
+        input:focus { outline: none; border-color: var(--primary); }
 
         button {
-            background: var(--primary);
-            color: white;
+            width: 100%;
+            padding: 12px;
+            background: var(--secondary);
+            color: #fff;
             border: none;
-            padding: 10px 20px;
-            border-radius: 4px;
             cursor: pointer;
             font-family: inherit;
             font-weight: bold;
             text-transform: uppercase;
-            font-size: 12px;
+            font-size: 14px;
             transition: 0.2s;
         }
-        button:hover { filter: brightness(1.2); }
-        button.btn-secondary { background: var(--border); }
-        button.btn-danger { background: var(--danger); }
-        
-        .input-group { display: flex; gap: 10px; flex-wrap: wrap; }
+        button:hover { background: var(--primary); color: #000; box-shadow: 0 0 15px var(--primary); }
+        button.btn-red { background: #500; }
+        button.btn-red:hover { background: var(--danger); }
 
-        /* STATUS */
-        .status { 
-            display: inline-block; padding: 5px 10px; border-radius: 4px; font-size: 12px; margin-top: 10px; 
-            border: 1px solid transparent;
-        }
-        .status.waiting { border-color: var(--accent); color: var(--accent); background: rgba(88, 166, 255, 0.1); }
-        .status.connected { border-color: var(--primary); color: var(--primary); background: rgba(35, 134, 54, 0.1); }
-        .status.error { border-color: var(--danger); color: var(--danger); }
+        .status-dot { height: 10px; width: 10px; border-radius: 50%; display: inline-block; margin-right: 5px; }
+        .connected { background: var(--primary); box-shadow: 0 0 5px var(--primary); }
+        .disconnected { background: var(--danger); }
 
-        /* CHAT AREA */
-        #chat-box { display: none; border-top: 2px solid var(--primary); padding-top: 20px; }
-        #messages {
-            height: 350px;
-            overflow-y: auto;
+        /* --- CHAT AREA (Full Screen) --- */
+        .chat-area {
+            display: flex;
+            flex-direction: column;
             background: #000;
-            border: 1px solid var(--border);
-            padding: 15px;
+            position: relative;
+        }
+
+        /* Video Overlay */
+        #video-container {
+            display: none; /* Hidden by default */
+            background: #000;
+            padding: 10px;
+            border-bottom: 2px solid var(--primary);
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            height: 200px;
+        }
+        video { width: 100%; height: 100%; object-fit: cover; border: 1px solid var(--border); background: #111; }
+        .hidden { display: none !important; }
+
+        /* Messages */
+        #messages {
+            flex-grow: 1;
+            padding: 20px;
+            overflow-y: auto;
             display: flex;
             flex-direction: column;
             gap: 10px;
-            margin-bottom: 15px;
+            background-image: 
+                linear-gradient(rgba(10, 16, 10, 0.95), rgba(10, 16, 10, 0.95)),
+                repeating-linear-gradient(0deg, transparent, transparent 1px, #111 1px, #111 2px);
+            background-size: 100% 4px;
         }
-        .message {
-            max-width: 80%;
-            padding: 10px;
-            border-radius: 4px;
-            font-size: 13px;
-            line-height: 1.4;
+
+        .msg {
+            max-width: 70%;
+            padding: 10px 15px;
+            font-size: 14px;
+            line-height: 1.5;
+            position: relative;
         }
-        .my-msg { align-self: flex-end; background: rgba(35, 134, 54, 0.2); border: 1px solid var(--primary); color: #fff; }
-        .peer-msg { align-self: flex-start; background: rgba(56, 139, 253, 0.1); border: 1px solid var(--accent); color: #fff; }
-        
-        .message-img { max-width: 100%; border: 1px solid var(--border); border-radius: 4px; cursor: pointer; }
-
-        /* VIDEO */
-        .video-container { background: #000; border: 1px solid var(--border); border-radius: 4px; padding: 10px; margin-bottom: 15px; }
-        .video-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-        video { width: 100%; border-radius: 2px; border: 1px solid var(--border); }
-        .hidden { display: none!important; }
-
-        /* PROJECT INFO FOOTER */
-        .project-info {
-            margin-top: 30px;
-            border-top: 1px solid var(--border);
-            padding-top: 20px;
-            font-size: 0.8em;
+        .msg-me { 
+            align-self: flex-end; 
+            background: rgba(0, 255, 65, 0.1); 
+            border: 1px solid var(--secondary); 
+            color: #fff; 
+            border-right: 3px solid var(--primary);
+        }
+        .msg-peer { 
+            align-self: flex-start; 
+            background: rgba(0, 184, 255, 0.1); 
+            border: 1px solid #005f85; 
+            color: #fff;
+            border-left: 3px solid var(--accent);
+        }
+        .sys-msg {
+            align-self: center;
+            font-size: 12px;
             color: var(--text-muted);
+            border: 1px solid #222;
+            padding: 5px 10px;
         }
-        .tech-stack span { margin-right: 10px; color: var(--accent); }
 
-        /* Responsive */
-        @media (max-width: 600px) {
-            .video-grid { grid-template-columns: 1fr; }
-            .input-group { flex-direction: column; }
-            button { width: 100%; }
+        /* Chat Input */
+        .chat-input-area {
+            padding: 20px;
+            background: var(--panel-bg);
+            border-top: 1px solid var(--border);
+            display: flex;
+            gap: 10px;
+        }
+
+        /* --- FOOTER (Tech Stack) --- */
+        .tech-footer {
+            grid-column: 1 / -1;
+            background: #000;
+            border-top: 1px solid #222;
+            padding: 10px 30px;
+            font-size: 11px;
+            color: #555;
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            text-transform: uppercase;
+        }
+        .tech-footer span { color: var(--secondary); }
+
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+            .main-grid { grid-template-columns: 1fr; }
+            .sidebar { padding: 10px; }
+            #messages { height: 50vh; }
+            .header { flex-direction: column; text-align: center; gap: 10px; }
+            .student-info { text-align: center; }
+            .my-id-box { font-size: 24px; }
         }
     </style>
 </head>
 <body>
 
-  <div class="container">
     <div class="header">
-      <h1>GhostLink <span class="badge">V1.0</span></h1>
-      <p>Decentralized End-to-End Encrypted Protocol</p>
+        <div class="logo">GhostLink <span>v2.0</span></div>
+        <div class="student-info">
+            PROJECT BY: <span class="student-name">AMIT KUMAR</span><br>
+            Shaheed Udham Singh Govt College, Indri Karnal
+        </div>
     </div>
 
-    <div class="card">
-      <div class="card-title">📡 Network Identity (Your Node)</div>
-      <div id="my-id" class="id-display">Initializing Secure Handshake...</div>
-      
-      <div class="input-group">
-        <input id="passphrase-generate" type="password" placeholder="Set Session Key (Password)" style="flex:2" />
-        <button onclick="generateConnectCode()">Generate Secure Key</button>
-      </div>
-      <div id="connect-code" class="id-display" style="display:none; color: var(--accent); border-color: var(--accent);"></div>
-      <button onclick="copyConnectCode()" class="btn-secondary" style="margin-top:5px; width:100%">Copy Encryption Key</button>
-    </div>
-
-    <div class="card">
-      <div class="card-title">🔗 Establish Uplink (Connect to Peer)</div>
-      
-      <div class="input-group">
-        <input type="text" id="friend-id" placeholder="Enter Target Node ID...">
-        <button onclick="connectToPeer()">Direct Connect</button>
-      </div>
-
-      <div style="text-align:center; margin: 10px; color:var(--border)">--- OR USE SECURE KEY ---</div>
-
-      <input id="connect-code-input" type="text" placeholder="Paste Encrypted Session Key..." />
-      <input id="passphrase-connect" type="password" placeholder="Enter Decryption Password..." />
-      
-      <div class="input-group">
-        <button onclick="connectUsingCode()">Decrypt & Connect</button>
-        <button onclick="clearConnectCodeInputs()" class="btn-secondary">Reset Form</button>
-      </div>
-
-      <div class="status waiting" id="status">System Standby... Waiting for Input.</div>
-    </div>
-
-    <div id="chat-box">
-      <div id="video-section" class="hidden">
-        <div class="video-container">
-            <div class="card-title" style="border:none">📹 Secure Video Feed</div>
-            <div class="video-grid">
-              <video id="local-video" autoplay muted playsinline></video>
-              <video id="remote-video" autoplay playsinline></video>
+    <div class="main-grid">
+        
+        <div class="sidebar">
+            <div class="panel">
+                <span class="panel-label">YOUR SECURE ID</span>
+                <div id="my-id" class="my-id-box">...</div>
+                <div style="text-align:center; font-size:11px; color:#666;">Share this 4-digit code</div>
             </div>
-            <div class="input-group" style="margin-top:10px">
-              <button id="mute-btn" class="btn-secondary" onclick="toggleMute()">🎤 Mute Audio</button>
-              <button id="video-btn" class="btn-secondary" onclick="toggleVideo()">📷 Stop Cam</button>
-              <button class="btn-danger" onclick="endCall()">❌ Terminate Uplink</button>
+
+            <div class="panel">
+                <span class="panel-label">CONNECT TO PEER</span>
+                <input type="number" id="friend-id" placeholder="Enter 4-Digit Code" />
+                <button onclick="connectToPeer()">INITIATE UPLINK</button>
+                <div id="status" style="margin-top:10px; font-size:12px; color:var(--text-muted);">
+                    <span class="status-dot disconnected"></span> Disconnected
+                </div>
+            </div>
+
+            <div class="panel">
+                <span class="panel-label">CONTROLS</span>
+                <button onclick="startCall()" style="margin-bottom:10px;">📹 START VIDEO</button>
+                <button class="btn-red" onclick="endCall()">❌ TERMINATE</button>
             </div>
         </div>
-      </div>
 
-      <div class="card">
-        <div class="card-title">💬 Encrypted Data Stream</div>
-        <div id="messages">
-            <div class="message peer-msg" style="color:var(--text-muted); border:none; background:none;">> System initialized.<br>> Encryption: AES-GCM 256-bit<br>> Server Status: NONE (P2P Mode)</div>
-        </div>
-        
-        <div class="input-group" style="margin-bottom:10px">
-            <button id="call-btn" onclick="startCall()" style="background:var(--accent)">📞 Start Video Call</button>
-            <button onclick="document.getElementById('photo-input').click()" class="btn-secondary">📁 Send File</button>
-        </div>
-        
-        <input type="file" id="photo-input" accept="image/*" onchange="sendPhoto()" style="display:none" />
-        
-        <div class="input-group">
-          <input type="text" id="msg-input" placeholder="Type secure message..." onkeypress="handleEnter(event)" />
-          <button onclick="sendMessage()">SEND DATA</button>
-        </div>
-      </div>
-    </div>
+        <div class="chat-area">
+            
+            <div id="video-container" class="hidden">
+                <video id="local-video" autoplay muted playsinline></video>
+                <video id="remote-video" autoplay playsinline></video>
+            </div>
 
-    <div class="project-info">
-        <h3>📂 Project Specs (For Exhibition)</h3>
-        <p><strong>Goal:</strong> To create a Serverless Communication System where data lives on user devices, not corporate servers.</p>
-        <div class="tech-stack" style="margin-top:10px;">
-            <span>⚡ <strong>WebRTC:</strong> Real-time Media Stream</span>
-            <span>🔒 <strong>AES-GCM:</strong> Military-grade Encryption</span>
-            <span>🌐 <strong>PeerJS:</strong> P2P Handshake Protocol</span>
+            <div id="messages">
+                <div class="sys-msg">SYSTEM INITIALIZED. WAITING FOR SECURE HANDSHAKE...</div>
+            </div>
+
+            <div class="chat-input-area">
+                <input type="text" id="msg-input" placeholder="Type encrypted message..." onkeypress="handleEnter(event)" style="margin-bottom:0;">
+                <button onclick="sendMessage()" style="width: 100px;">SEND</button>
+            </div>
+        </div>
+
+        <div class="tech-footer">
+            Technologies Used: 
+            <span>HTML5</span> • 
+            <span>CSS3 (Grid/Flex)</span> • 
+            <span>JavaScript (ES6)</span> • 
+            <span>WebRTC (P2P Video)</span> • 
+            <span>PeerJS API</span>
         </div>
     </div>
 
-  </div>
+    <script>
+        /* --- LOGIC: SIMPLIFIED FOR EXHIBITION --- */
+        
+        // 1. Generate a random 4-digit ID (1000 to 9999)
+        // This makes it easy to type on the other phone
+        const mySimpleId = Math.floor(Math.random() * 9000 + 1000).toString();
 
-<script>
-/* CORE LOGIC (UNCHANGED FUNCTIONALITY, JUST PRESERVED)
-   Uses Web Crypto API & PeerJS
-*/
+        let peer = new Peer(mySimpleId); 
+        let conn = null;
+        let call = null;
+        let localStream = null;
 
-// --- CRYPTO UTILS ---
-function toBase64Url(bytes) {
-  const b64 = btoa(String.fromCharCode(...new Uint8Array(bytes)));
-  return b64.replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
-}
-function fromBase64Url(s) {
-  s = s.replace(/-/g, '+').replace(/_/g, '/');
-  while (s.length % 4) s += '=';
-  const str = atob(s);
-  const bytes = new Uint8Array(str.length);
-  for (let i=0;i<str.length;i++) bytes[i]=str.charCodeAt(i);
-  return bytes;
-}
-async function deriveKey(passphrase, salt, iterations = 120000) {
-  const enc = new TextEncoder();
-  const passkey = await crypto.subtle.importKey('raw', enc.encode(passphrase), 'PBKDF2', false, ['deriveKey']);
-  return crypto.subtle.deriveKey(
-    { name: 'PBKDF2', salt: enc.encode(salt), iterations: iterations, hash: 'SHA-256' },
-    passkey, { name: 'AES-GCM', length: 256 }, false, ['encrypt','decrypt']
-  );
-}
-async function encryptWithPassphrase(plaintext, passphrase) {
-  const iv = crypto.getRandomValues(new Uint8Array(12));
-  const salt = crypto.getRandomValues(new Uint8Array(12));
-  const key = await deriveKey(passphrase, Array.from(salt).join('-'));
-  const enc = new TextEncoder();
-  const ciphertext = await crypto.subtle.encrypt({ name: 'AES-GCM', iv }, key, enc.encode(plaintext));
-  const combined = new Uint8Array(salt.byteLength + iv.byteLength + ciphertext.byteLength);
-  combined.set(salt, 0); combined.set(iv, salt.byteLength); combined.set(new Uint8Array(ciphertext), salt.byteLength + iv.byteLength);
-  return toBase64Url(combined);
-}
-async function decryptWithPassphrase(code, passphrase) {
-  const combined = fromBase64Url(code);
-  if (combined.length < 24) throw new Error('Invalid code');
-  const salt = combined.slice(0,12);
-  const iv = combined.slice(12,24);
-  const ciphertext = combined.slice(24);
-  const key = await deriveKey(passphrase, Array.from(salt).join('-'));
-  const plainbuf = await crypto.subtle.decrypt({ name: 'AES-GCM', iv }, key, ciphertext);
-  return new TextDecoder().decode(plainbuf);
-}
+        // DOM Elements
+        const ui = {
+            idDisplay: document.getElementById('my-id'),
+            status: document.getElementById('status'),
+            msgs: document.getElementById('messages'),
+            videoBox: document.getElementById('video-container'),
+            localVid: document.getElementById('local-video'),
+            remoteVid: document.getElementById('remote-video')
+        };
 
-// --- GLOBAL VARS ---
-let peer = null, conn = null, call = null, localStream = null;
-let isAudioMuted = false, isVideoOff = false;
-let AUTH_KEY = null, LOCAL_AUTH_TOKEN = null;
-
-// --- DOM ELEMENTS ---
-const els = {
-    myId: document.getElementById('my-id'),
-    status: document.getElementById('status'),
-    chatBox: document.getElementById('chat-box'),
-    msgs: document.getElementById('messages'),
-    videoSection: document.getElementById('video-section'),
-    localVideo: document.getElementById('local-video'),
-    remoteVideo: document.getElementById('remote-video')
-};
-
-// --- PEERJS SETUP ---
-function createPeer() {
-  peer = new Peer();
-  peer.on('open', id => {
-    els.myId.innerText = id;
-    updateStatus('Node Online. Ready for Uplink.', 'waiting');
-  });
-  peer.on('connection', c => setupConnection(c));
-  peer.on('call', incoming => {
-    if(confirm('Incoming Secure Video Feed. Accept?')) {
-        navigator.mediaDevices.getUserMedia({video:true, audio:true}).then(stream => {
-            localStream = stream;
-            els.localVideo.srcObject = stream;
-            incoming.answer(stream);
-            call = incoming;
-            incoming.on('stream', remote => {
-                els.remoteVideo.srcObject = remote;
-                showVideoSection();
-            });
-            incoming.on('close', endCall);
+        // --- INITIALIZATION ---
+        peer.on('open', (id) => {
+            ui.idDisplay.innerText = id;
+            logSystem("Node Online. ID: " + id);
         });
-    }
-  });
-}
-createPeer();
 
-// --- CONNECTION LOGIC ---
-function connectToPeer() {
-    let id = document.getElementById('friend-id').value.trim();
-    if(!id) return alert("Target ID Required");
-    updateStatus('Attempting Handshake...', 'waiting');
-    let c = peer.connect(id);
-    c.on('open', () => setupConnection(c));
-    c.on('error', e => updateStatus('Handshake Failed', 'error'));
-}
+        peer.on('error', (err) => {
+            console.error(err);
+            if(err.type === 'unavailable-id') {
+                alert("ID Collision. Refreshing...");
+                location.reload();
+            } else {
+                alert("Connection Error. Check Internet.");
+            }
+        });
 
-async function generateConnectCode() {
-    let pass = document.getElementById('passphrase-generate').value;
-    if(!pass) return alert("Encryption Key (Password) Required");
-    if(!peer.id) return alert("System Initializing...");
-    
-    try {
-        let code = await encryptWithPassphrase(peer.id, pass);
-        let disp = document.getElementById('connect-code');
-        disp.textContent = code;
-        disp.style.display = 'block';
-        updateStatus('Encryption Key Generated.', 'waiting');
-    } catch(e) { alert(e.message); }
-}
+        // --- INCOMING CONNECTION ---
+        peer.on('connection', (c) => {
+            setupConnection(c);
+        });
 
-function copyConnectCode() {
-    let txt = document.getElementById('connect-code').textContent;
-    if(txt) navigator.clipboard.writeText(txt).then(() => alert("Key Copied to Clipboard"));
-}
+        // --- INCOMING CALL ---
+        peer.on('call', (incomingCall) => {
+            if(confirm("Incoming Secure Video Feed. Accept?")) {
+                navigator.mediaDevices.getUserMedia({video: true, audio: true}).then((stream) => {
+                    localStream = stream;
+                    ui.localVid.srcObject = stream;
+                    ui.videoBox.classList.remove('hidden');
+                    
+                    incomingCall.answer(stream);
+                    call = incomingCall;
+                    
+                    incomingCall.on('stream', (remoteStream) => {
+                        ui.remoteVid.srcObject = remoteStream;
+                    });
+                });
+            }
+        });
 
-async function connectUsingCode() {
-    let code = document.getElementById('connect-code-input').value.trim();
-    let pass = document.getElementById('passphrase-connect').value;
-    if(!code || !pass) return alert("Missing Key or Password");
-    
-    updateStatus('Decrypting Identity...', 'waiting');
-    try {
-        let id = await decryptWithPassphrase(code, pass);
-        await deriveAuthKey(pass); // Setup Auth
-        let c = peer.connect(id, {reliable:true});
-        c.on('open', () => setupConnection(c));
-    } catch(e) { 
-        alert("Decryption Failed. Wrong Password?"); 
-        updateStatus('Access Denied', 'error');
-    }
-}
-
-// --- AUTH HANDSHAKE (Simplified for readability) ---
-async function deriveAuthKey(pass) {
-    let enc = new TextEncoder();
-    let base = await crypto.subtle.importKey('raw', enc.encode(pass), 'PBKDF2', false, ['deriveBits']);
-    AUTH_KEY = await crypto.subtle.deriveBits({name:'PBKDF2', salt:enc.encode('salt'), iterations:1000, hash:'SHA-256'}, base, 256);
-    LOCAL_AUTH_TOKEN = toBase64Url(crypto.getRandomValues(new Uint8Array(12)));
-}
-
-function setupConnection(c) {
-    conn = c;
-    els.chatBox.style.display = 'block';
-    updateStatus('Uplink Established: ' + c.peer, 'connected');
-    
-    c.on('data', data => {
-        // Handle incoming data
-        if(typeof data === 'string') {
-            try { 
-                let d = JSON.parse(data);
-                if(d.type === 'photo') addPhotoMessage(d.data, 'peer-msg');
-                else if(d.type === 'text') addMessage(d.text, 'peer-msg');
-            } catch(e) { addMessage(data, 'peer-msg'); }
+        // --- CONNECT TO OTHER ---
+        function connectToPeer() {
+            const targetId = document.getElementById('friend-id').value;
+            if(targetId.length !== 4) return alert("Please enter the 4-digit code.");
+            
+            logSystem("Attempting handshake with " + targetId + "...");
+            const c = peer.connect(targetId);
+            setupConnection(c);
         }
-    });
-    c.on('close', () => {
-        updateStatus('Uplink Terminated', 'error');
-        endCall();
-    });
-}
 
-// --- MESSAGING & MEDIA ---
-function sendMessage() {
-    let input = document.getElementById('msg-input');
-    let val = input.value.trim();
-    if(!val || !conn) return;
-    conn.send(JSON.stringify({type:'text', text:val}));
-    addMessage(val, 'my-msg');
-    input.value = '';
-}
+        function setupConnection(c) {
+            conn = c;
+            
+            c.on('open', () => {
+                ui.status.innerHTML = '<span class="status-dot connected"></span> Connected';
+                logSystem("SECURE UPLINK ESTABLISHED.");
+            });
 
-function sendPhoto() {
-    let file = document.getElementById('photo-input').files[0];
-    if(!file || !conn) return;
-    let reader = new FileReader();
-    reader.onload = e => {
-        conn.send(JSON.stringify({type:'photo', data:e.target.result}));
-        addPhotoMessage(e.target.result, 'my-msg');
-    };
-    reader.readAsDataURL(file);
-}
+            c.on('data', (data) => {
+                addMessage(data, 'peer');
+            });
 
-function addMessage(text, cls) {
-    let d = document.createElement('div');
-    d.className = 'message ' + cls;
-    d.textContent = '> ' + text;
-    els.msgs.appendChild(d);
-    els.msgs.scrollTop = els.msgs.scrollHeight;
-}
+            c.on('close', () => {
+                ui.status.innerHTML = '<span class="status-dot disconnected"></span> Disconnected';
+                logSystem("Uplink Lost.");
+                endCall();
+            });
+        }
 
-function addPhotoMessage(src, cls) {
-    let d = document.createElement('div');
-    d.className = 'message ' + cls;
-    let img = document.createElement('img');
-    img.className = 'message-img';
-    img.src = src;
-    d.appendChild(img);
-    els.msgs.appendChild(d);
-    els.msgs.scrollTop = els.msgs.scrollHeight;
-}
+        // --- MESSAGING ---
+        function sendMessage() {
+            const input = document.getElementById('msg-input');
+            const text = input.value;
+            if(!text) return;
+            
+            if(conn && conn.open) {
+                conn.send(text);
+                addMessage(text, 'me');
+                input.value = '';
+            } else {
+                alert("Not connected to a peer!");
+            }
+        }
 
-// --- VIDEO CALLS ---
-async function startCall() {
-    if(!conn) return alert("No Uplink");
-    localStream = await navigator.mediaDevices.getUserMedia({video:true, audio:true});
-    els.localVideo.srcObject = localStream;
-    call = peer.call(conn.peer, localStream);
-    call.on('stream', r => {
-        els.remoteVideo.srcObject = r;
-        showVideoSection();
-    });
-}
+        function addMessage(text, type) {
+            const div = document.createElement('div');
+            div.className = type === 'me' ? 'msg msg-me' : 'msg msg-peer';
+            div.innerText = text;
+            ui.msgs.appendChild(div);
+            ui.msgs.scrollTop = ui.msgs.scrollHeight;
+        }
 
-function endCall() {
-    if(localStream) localStream.getTracks().forEach(t=>t.stop());
-    if(call) call.close();
-    els.videoSection.classList.add('hidden');
-}
+        function logSystem(text) {
+            const div = document.createElement('div');
+            div.className = 'sys-msg';
+            div.innerText = "> " + text;
+            ui.msgs.appendChild(div);
+            ui.msgs.scrollTop = ui.msgs.scrollHeight;
+        }
 
-function toggleMute() {
-    if(localStream) {
-        let track = localStream.getAudioTracks()[0];
-        track.enabled = !track.enabled;
-        document.getElementById('mute-btn').innerText = track.enabled ? "🎤 Mute" : "🔇 Unmute";
-    }
-}
-function toggleVideo() {
-    if(localStream) {
-        let track = localStream.getVideoTracks()[0];
-        track.enabled = !track.enabled;
-        document.getElementById('video-btn').innerText = track.enabled ? "📷 Stop Cam" : "📷 Start Cam";
-    }
-}
-function showVideoSection() { els.videoSection.classList.remove('hidden'); }
-function clearConnectCodeInputs() { document.getElementById('connect-code-input').value=''; document.getElementById('passphrase-connect').value=''; }
-function handleEnter(e) { if(e.key==='Enter') sendMessage(); }
-function updateStatus(msg, type) { 
-    els.status.textContent = msg; 
-    els.status.className = 'status ' + type; 
-}
-</script>
+        function handleEnter(e) {
+            if(e.key === 'Enter') sendMessage();
+        }
+
+        // --- VIDEO LOGIC ---
+        function startCall() {
+            if(!conn) return alert("Connect to a peer first!");
+            
+            navigator.mediaDevices.getUserMedia({video: true, audio: true}).then((stream) => {
+                localStream = stream;
+                ui.localVid.srcObject = stream;
+                ui.videoBox.classList.remove('hidden');
+
+                const outCall = peer.call(conn.peer, stream);
+                call = outCall;
+                
+                outCall.on('stream', (remoteStream) => {
+                    ui.remoteVid.srcObject = remoteStream;
+                });
+            }).catch(err => alert("Camera access denied"));
+        }
+
+        function endCall() {
+            if(localStream) {
+                localStream.getTracks().forEach(track => track.stop());
+            }
+            if(call) call.close();
+            ui.videoBox.classList.add('hidden');
+        }
+
+    </script>
 </body>
 </html>
