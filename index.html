@@ -3,9 +3,10 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
-    <title>GhostLink | Secure P2P</title>
+    <title>GhostLink | Secure P2P System</title>
     <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
         /* --- CYBERPUNK THEME --- */
@@ -27,42 +28,42 @@
             font-family: 'JetBrains Mono', monospace;
             background-color: var(--bg-color);
             color: var(--text-main);
-            height: 100vh; /* Full screen height */
+            height: 100vh;
             display: flex;
             flex-direction: column;
-            overflow: hidden; /* Prevent body scroll */
+            overflow: hidden; 
         }
 
         /* --- 1. HEADER --- */
         .header {
-            padding: 10px 20px;
+            padding: 0 15px;
             background: #000;
             border-bottom: 1px solid var(--border);
             display: flex;
             justify-content: space-between;
             align-items: center;
-            height: 60px;
+            height: 50px;
             flex-shrink: 0;
         }
-        .logo { font-size: 20px; font-weight: bold; color: var(--primary); letter-spacing: 2px; }
-        .logo span { font-size: 12px; color: var(--text-muted); }
-        .status-badge { font-size: 12px; padding: 4px 8px; border-radius: 4px; background: #222; color: #888; }
+        .logo { font-size: 18px; font-weight: bold; color: var(--primary); letter-spacing: 1px; }
+        .logo span { font-size: 11px; color: var(--text-muted); }
+        .status-badge { font-size: 11px; padding: 3px 8px; border-radius: 4px; background: #222; color: #888; }
         .status-badge.online { background: rgba(0, 255, 65, 0.2); color: var(--primary); border: 1px solid var(--secondary); }
 
         /* --- 2. MAIN CONTENT GRID --- */
         .main-container {
             display: flex;
-            flex: 1; /* Takes remaining height */
-            height: calc(100vh - 100px); /* Subtract header + footer */
+            flex: 1; 
+            height: calc(100vh - 100px); 
             overflow: hidden;
         }
 
         /* --- SIDEBAR (CONTROLS) --- */
         .sidebar {
-            width: 320px;
+            width: 300px;
             background: var(--panel-bg);
             border-right: 1px solid var(--border);
-            padding: 20px;
+            padding: 15px;
             display: flex;
             flex-direction: column;
             gap: 15px;
@@ -72,33 +73,34 @@
         .panel {
             background: #080808;
             border: 1px solid var(--border);
-            padding: 15px;
+            padding: 12px;
             border-radius: 6px;
         }
-        .panel h3 { font-size: 11px; color: var(--text-muted); text-transform: uppercase; margin-bottom: 10px; border-bottom: 1px solid #222; padding-bottom: 5px; }
+        .panel h3 { font-size: 10px; color: var(--text-muted); text-transform: uppercase; margin-bottom: 8px; border-bottom: 1px solid #222; padding-bottom: 5px; }
 
         /* ID Box */
         .my-id-display {
-            font-size: 36px;
+            font-size: 32px;
             color: var(--primary);
             text-align: center;
             font-weight: bold;
-            padding: 10px;
+            padding: 8px;
             border: 2px dashed var(--secondary);
             background: rgba(0,0,0,0.5);
-            text-shadow: 0 0 15px rgba(0, 255, 65, 0.2);
+            text-shadow: 0 0 10px rgba(0, 255, 65, 0.2);
+            letter-spacing: 2px;
         }
         
         /* Inputs */
         input {
             width: 100%;
-            padding: 12px;
+            padding: 10px;
             background: #000;
             border: 1px solid var(--border);
             color: #fff;
             text-align: center;
             font-family: inherit;
-            font-size: 16px;
+            font-size: 14px;
             margin-bottom: 8px;
             border-radius: 4px;
         }
@@ -107,25 +109,31 @@
         /* Buttons */
         button {
             width: 100%;
-            padding: 12px;
+            padding: 10px;
             border: none;
             cursor: pointer;
             font-family: inherit;
             font-weight: bold;
             text-transform: uppercase;
-            font-size: 13px;
+            font-size: 12px;
             border-radius: 4px;
             transition: 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
         }
         .btn-connect { background: var(--accent); color: #000; }
-        .btn-connect:hover { box-shadow: 0 0 10px var(--accent); }
+        .btn-video { background: var(--primary); color: #000; margin-bottom: 5px; padding: 12px; font-size: 14px;}
+        .btn-icon { width: auto; flex: 1; padding: 8px; font-size: 16px; }
+        .btn-red { background: var(--danger); color: #fff; }
+        .btn-grey { background: #333; color: #ccc; }
         
-        .btn-video { background: var(--primary); color: #000; margin-bottom: 5px; }
-        .btn-stop { background: var(--danger); color: #fff; }
+        .active-btn { background: #fff; color: #000; }
 
         /* --- CHAT AREA --- */
         .chat-section {
-            flex: 1; /* Takes remaining width */
+            flex: 1;
             display: flex;
             flex-direction: column;
             background: #000;
@@ -134,33 +142,47 @@
 
         /* Video Overlay */
         #video-area {
-            height: 200px;
             background: #050505;
             border-bottom: 2px solid var(--primary);
+            display: flex;
+            flex-direction: column;
+        }
+        .video-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 2px;
+            height: 200px;
         }
         video { width: 100%; height: 100%; object-fit: cover; background: #111; }
+        
+        /* Video Controls (Mute/Cam) */
+        .video-controls {
+            display: flex;
+            gap: 10px;
+            padding: 10px;
+            background: #111;
+            justify-content: center;
+        }
+
         .hidden { display: none !important; }
 
         /* Messages List */
         #messages {
             flex: 1;
             overflow-y: auto;
-            padding: 20px;
+            padding: 15px;
             display: flex;
             flex-direction: column;
-            gap: 12px;
+            gap: 10px;
             background-image: radial-gradient(#111 1px, transparent 1px);
             background-size: 20px 20px;
         }
 
         .msg {
-            max-width: 80%;
-            padding: 10px 14px;
+            max-width: 85%;
+            padding: 8px 12px;
             border-radius: 6px;
-            font-size: 14px;
+            font-size: 13px;
             line-height: 1.4;
             word-wrap: break-word;
         }
@@ -180,10 +202,10 @@
         }
         .sys-msg {
             align-self: center;
-            font-size: 11px;
+            font-size: 10px;
             color: #555;
             background: #111;
-            padding: 4px 10px;
+            padding: 2px 8px;
             border-radius: 10px;
             border: 1px solid #222;
         }
@@ -194,149 +216,174 @@
             background: #111;
             border-top: 1px solid var(--border);
             display: flex;
-            gap: 10px;
+            gap: 8px;
         }
         .input-bar input { margin: 0; text-align: left; }
-        .input-bar button { width: auto; padding: 0 20px; }
+        .input-bar button { width: auto; padding: 0 15px; }
 
         /* --- 3. FOOTER (CREDITS) --- */
         .footer {
-            height: 40px;
-            background: #000;
+            background: #080808;
             border-top: 1px solid var(--border);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-size: 11px;
+            padding: 10px;
+            font-size: 10px;
             color: #666;
             text-align: center;
-            padding: 0 10px;
             flex-shrink: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
         }
-        .footer strong { color: var(--primary); margin-left: 5px; }
-        .college-name { color: #888; margin-left: 5px; }
+        .footer strong { color: var(--primary); }
+        .tech-stack { color: var(--accent); font-size: 9px; text-transform: uppercase; margin-top: 2px;}
 
         /* --- MOBILE RESPONSIVENESS --- */
         @media (max-width: 768px) {
-            .main-container { flex-direction: column; }
+            .main-container { flex-direction: column; height: auto; flex: 1; }
             
             .sidebar { 
                 width: 100%; 
                 height: auto; 
-                max-height: 180px; /* Limit height so chat is visible */
                 padding: 10px; 
                 flex-direction: row; 
                 flex-wrap: wrap;
-                justify-content: center;
+                gap: 8px;
+                border-bottom: 1px solid var(--border);
+                flex-shrink: 0;
             }
             
-            .panel { padding: 10px; flex: 1; min-width: 140px; }
-            .my-id-display { font-size: 24px; padding: 5px; }
+            /* Make ID box smaller on mobile */
+            .panel { padding: 8px; flex: 1; min-width: 120px; }
+            .my-id-display { font-size: 22px; padding: 2px; }
+            .panel h3 { display: none; } /* Hide labels on mobile to save space */
             
-            #video-area { height: 150px; }
+            /* Make buttons big for fingers */
+            .btn-video { padding: 15px; font-size: 14px; }
             
-            .footer { font-size: 10px; flex-direction: column; height: auto; padding: 5px; }
+            #video-area .video-grid { height: 160px; }
+            
+            /* Ensure footer text wraps */
+            .footer { height: auto; padding: 10px 5px; }
         }
     </style>
 </head>
 <body>
 
     <div class="header">
-        <div class="logo">GhostLink <span>v3.0</span></div>
+        <div class="logo">GhostLink <span>v4.0</span></div>
         <div id="connection-status" class="status-badge">Offline</div>
     </div>
 
     <div class="main-container">
         
         <div class="sidebar">
-            <div class="panel">
-                <h3>Your Secure ID</h3>
+            <div class="panel" style="text-align:center;">
+                <h3>Your ID</h3>
                 <div id="my-id" class="my-id-display">...</div>
             </div>
 
             <div class="panel">
-                <h3>Connect to Peer</h3>
-                <input type="number" id="friend-id" placeholder="Enter 4-Digit ID">
-                <button class="btn-connect" onclick="connectToPeer()">Link</button>
+                <input type="number" id="friend-id" placeholder="Peer ID (4-Digits)">
+                <button class="btn-connect" onclick="connectToPeer()">
+                    <i class="fa-solid fa-link"></i> Link
+                </button>
             </div>
 
-            <div class="panel" style="display:flex; flex-direction:column;">
-                <h3>Controls</h3>
-                <button class="btn-video" onclick="startCall()">📹 Video</button>
-                <button class="btn-stop" onclick="endCall()">❌ End</button>
+            <div class="panel" style="flex: 100%; border:none; background:none; padding:0;">
+                <button class="btn-video" onclick="startCall()">
+                    <i class="fa-solid fa-video"></i> VIDEO CALL
+                </button>
             </div>
         </div>
 
         <div class="chat-section">
             
             <div id="video-area" class="hidden">
-                <video id="local-video" autoplay muted playsinline></video>
-                <video id="remote-video" autoplay playsinline></video>
+                <div class="video-grid">
+                    <video id="local-video" autoplay muted playsinline></video>
+                    <video id="remote-video" autoplay playsinline></video>
+                </div>
+                <div class="video-controls">
+                    <button class="btn-grey btn-icon" id="mute-btn" onclick="toggleMute()">
+                        <i class="fa-solid fa-microphone"></i>
+                    </button>
+                    <button class="btn-grey btn-icon" id="cam-btn" onclick="toggleCam()">
+                        <i class="fa-solid fa-camera"></i>
+                    </button>
+                    <button class="btn-red btn-icon" onclick="endCall()">
+                        <i class="fa-solid fa-phone-slash"></i>
+                    </button>
+                </div>
             </div>
 
             <div id="messages">
-                <div class="sys-msg">System Initialized. Waiting for connection...</div>
+                <div class="sys-msg">System Initialized. Share your ID to connect.</div>
             </div>
 
             <div class="input-bar">
                 <input type="text" id="msg-input" placeholder="Type message..." onkeypress="handleEnter(event)">
-                <button class="btn-connect" onclick="sendMessage()">SEND</button>
+                <button class="btn-connect" onclick="sendMessage()"><i class="fa-solid fa-paper-plane"></i></button>
             </div>
         </div>
     </div>
 
     <div class="footer">
-        Created by <strong>Amit Kumar</strong> 
-        <span class="college-name"> | Shaheed Udham Singh Govt College, Indri Karnal</span>
+        <div>Project Created By <strong>Amit Kumar</strong></div>
+        <div style="color: #555;">Shaheed Udham Singh Govt College, Indri Karnal</div>
+        <div class="tech-stack">
+            Tech Used: HTML5 • CSS3 • JS • WebRTC • PeerJS
+        </div>
     </div>
 
     <script>
-        // 1. Generate Random 4-Digit ID
+        // 1. Setup ID
         const mySimpleId = Math.floor(Math.random() * 9000 + 1000).toString();
         
-        // 2. Initialize PeerJS
+        // 2. Init PeerJS
         const peer = new Peer(mySimpleId);
         let conn = null;
         let call = null;
         let localStream = null;
+        
+        // State for Mute/Cam
+        let isMuted = false;
+        let isCamOff = false;
 
-        // UI Elements
+        // UI Refs
         const ui = {
             idDisplay: document.getElementById('my-id'),
             statusBadge: document.getElementById('connection-status'),
             msgs: document.getElementById('messages'),
             videoArea: document.getElementById('video-area'),
             localVid: document.getElementById('local-video'),
-            remoteVid: document.getElementById('remote-video')
+            remoteVid: document.getElementById('remote-video'),
+            muteBtn: document.getElementById('mute-btn'),
+            camBtn: document.getElementById('cam-btn')
         };
 
-        // --- EVENTS ---
-
-        // On Open (When we get our ID)
+        // --- PEER EVENTS ---
         peer.on('open', (id) => {
             ui.idDisplay.innerText = id;
             ui.statusBadge.innerText = "Online";
             ui.statusBadge.classList.add('online');
-            logSystem("Your Node is Active. Share ID: " + id);
+            logSystem("Your ID is " + id);
         });
 
-        // On Incoming Connection
         peer.on('connection', (c) => {
             setupConnection(c);
         });
 
-        // On Incoming Call
         peer.on('call', (incomingCall) => {
-            if(confirm("Incoming Secure Video Feed. Accept?")) {
+            if(confirm("Incoming Video Call. Accept?")) {
                 openCamera().then(() => {
                     incomingCall.answer(localStream);
                     handleCallStream(incomingCall);
+                    ui.videoArea.classList.remove('hidden');
                 });
             }
         });
 
         peer.on('error', (err) => {
-            console.error(err);
             alert("Error: " + err.type);
         });
 
@@ -344,27 +391,21 @@
 
         function connectToPeer() {
             const targetId = document.getElementById('friend-id').value;
-            if(targetId.length !== 4) return alert("Please enter a 4-digit ID");
-            
-            logSystem("Attempting handshake with " + targetId + "...");
+            if(targetId.length !== 4) return alert("Enter 4-digit ID");
+            logSystem("Connecting to " + targetId + "...");
             const c = peer.connect(targetId);
             setupConnection(c);
         }
 
         function setupConnection(c) {
             conn = c;
-            
             c.on('open', () => {
-                logSystem("SECURE LINK ESTABLISHED.");
+                logSystem("Connected to " + c.peer);
                 ui.statusBadge.innerText = "Linked: " + c.peer;
             });
-
-            c.on('data', (data) => {
-                addMessage(data, 'peer');
-            });
-
+            c.on('data', (data) => addMessage(data, 'peer'));
             c.on('close', () => {
-                logSystem("Link Terminated.");
+                logSystem("Connection Lost.");
                 ui.statusBadge.innerText = "Online";
                 endCall();
             });
@@ -374,7 +415,6 @@
             const input = document.getElementById('msg-input');
             const text = input.value;
             if(!text) return;
-            
             if(conn && conn.open) {
                 conn.send(text);
                 addMessage(text, 'me');
@@ -389,15 +429,15 @@
             await openCamera();
             const outCall = peer.call(conn.peer, localStream);
             handleCallStream(outCall);
+            ui.videoArea.classList.remove('hidden');
         }
 
         async function openCamera() {
             try {
                 localStream = await navigator.mediaDevices.getUserMedia({video: true, audio: true});
                 ui.localVid.srcObject = localStream;
-                ui.videoArea.classList.remove('hidden');
             } catch(err) {
-                alert("Camera access failed: " + err);
+                alert("Camera failed: " + err);
             }
         }
 
@@ -410,14 +450,39 @@
         }
 
         function endCall() {
-            if(localStream) {
-                localStream.getTracks().forEach(t => t.stop());
-            }
+            if(localStream) localStream.getTracks().forEach(t => t.stop());
             if(call) call.close();
             ui.videoArea.classList.add('hidden');
+            ui.localVid.srcObject = null;
+            ui.remoteVid.srcObject = null;
         }
 
-        // --- HELPERS ---
+        // --- TOGGLE CONTROLS ---
+        function toggleMute() {
+            if(localStream) {
+                const audioTrack = localStream.getAudioTracks()[0];
+                if(audioTrack) {
+                    isMuted = !isMuted;
+                    audioTrack.enabled = !isMuted;
+                    ui.muteBtn.innerHTML = isMuted ? '<i class="fa-solid fa-microphone-slash"></i>' : '<i class="fa-solid fa-microphone"></i>';
+                    ui.muteBtn.style.color = isMuted ? 'red' : 'white';
+                }
+            }
+        }
+
+        function toggleCam() {
+            if(localStream) {
+                const videoTrack = localStream.getVideoTracks()[0];
+                if(videoTrack) {
+                    isCamOff = !isCamOff;
+                    videoTrack.enabled = !isCamOff;
+                    ui.camBtn.innerHTML = isCamOff ? '<i class="fa-solid fa-video-slash"></i>' : '<i class="fa-solid fa-video"></i>';
+                    ui.camBtn.style.color = isCamOff ? 'red' : 'white';
+                }
+            }
+        }
+
+        // --- UI HELPERS ---
         function addMessage(text, type) {
             const div = document.createElement('div');
             div.className = type === 'me' ? 'msg msg-me' : 'msg msg-peer';
