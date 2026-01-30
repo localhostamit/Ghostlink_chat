@@ -2124,8 +2124,11 @@
         function showSetupModal() {
             if (!isSetupComplete()) {
                 document.getElementById('setup-modal').classList.remove('hidden');
+            } else {
+                // Setup already complete, update UI if possible
+                // This will be called again in peer.on('open') but safe to call multiple times
+                updateUIForMode();
             }
-            // UI update will happen in peer.on('open') after ui is initialized
         }
         
         function goToSetupStep(step) {
