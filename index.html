@@ -1759,7 +1759,7 @@
                 </div>
             </div>
 
-            <div class="panel">
+            <div class="panel" id="peer-id-panel">
                 <h3><i class="fa-solid fa-link"></i> Connect to Peer</h3>
                 <input type="number" id="friend-id" placeholder="Enter 4-digit Peer ID" inputmode="numeric" pattern="[0-9]*">
                 <button class="btn-connect" onclick="connectToPeer()">
@@ -2124,8 +2124,11 @@
         function showSetupModal() {
             if (!isSetupComplete()) {
                 document.getElementById('setup-modal').classList.remove('hidden');
+            } else {
+                // Setup already complete, update UI if possible
+                // This will be called again in peer.on('open') but safe to call multiple times
+                updateUIForMode();
             }
-            // UI update will happen in peer.on('open') after ui is initialized
         }
         
         function goToSetupStep(step) {
@@ -2182,31 +2185,44 @@
             const isPersistent = isChatStorageEnabled();
             const modeBadge = document.getElementById('user-mode-badge');
             const contactsPanel = document.getElementById('contacts-panel');
+            const peerIdPanel = document.getElementById('peer-id-panel');
             const clearDataSection = document.getElementById('clear-data-section');
             const saveChatsToggle = document.getElementById('save-chats-toggle');
             
             if (isPersistent) {
-                modeBadge.textContent = 'Saved';
-                modeBadge.classList.remove('guest');
-                contactsPanel.classList.remove('hidden');
-                clearDataSection.classList.remove('hidden');
-                saveChatsToggle.checked = true;
+                if (modeBadge) {
+                    modeBadge.textContent = 'Saved';
+                    modeBadge.classList.remove('guest');
+                }
+                if (contactsPanel) contactsPanel.classList.remove('hidden');
+                if (clearDataSection) clearDataSection.classList.remove('hidden');
+                if (saveChatsToggle) saveChatsToggle.checked = true;
+                // Hide peer ID panel in Save Chats mode - users connect via saved contacts
+                if (peerIdPanel) peerIdPanel.classList.add('hidden');
                 renderContacts();
             } else {
-                modeBadge.textContent = 'Guest';
-                modeBadge.classList.add('guest');
-                contactsPanel.classList.add('hidden');
-                clearDataSection.classList.add('hidden');
-                saveChatsToggle.checked = false;
+                if (modeBadge) {
+                    modeBadge.textContent = 'Guest';
+                    modeBadge.classList.add('guest');
+                }
+                if (contactsPanel) contactsPanel.classList.add('hidden');
+                if (clearDataSection) clearDataSection.classList.add('hidden');
+                if (saveChatsToggle) saveChatsToggle.checked = false;
+                // Show peer ID panel in Guest/Privacy mode
+                if (peerIdPanel) peerIdPanel.classList.remove('hidden');
             }
             
-            // Update username display if ui is initialized
-            if (typeof ui !== 'undefined' && ui.usernameDisplay) {
-                ui.usernameDisplay.innerText = myUsername;
-            } else {
-                const usernameEl = document.getElementById('my-username');
-                if (usernameEl) usernameEl.innerText = myUsername;
+            // Update username display - check both ui object and direct DOM access
+            try {
+                if (typeof ui !== 'undefined' && ui && ui.usernameDisplay) {
+                    ui.usernameDisplay.innerText = myUsername;
+                }
+            } catch (e) {
+                // Expected: ui not yet initialized (temporal dead zone), will fallback to DOM
+                // Unexpected errors will be caught but UI will still update via DOM below
             }
+            const usernameEl = document.getElementById('my-username');
+            if (usernameEl) usernameEl.innerText = myUsername;
         }
         
         function toggleChatStorage() {
@@ -2318,8 +2334,16 @@
             }
         });
 
-        // 2. Init PeerJS
-        const peer = new Peer(mySimpleId);
+        // 2. Init PeerJS with optimized configuration
+        const peer = new Peer(mySimpleId, {
+            debug: 0, // Disable debug logging to reduce console output
+            config: {
+                iceServers: [
+                    { urls: 'stun:stun.l.google.com:19302' },
+                    { urls: 'stun:stun1.l.google.com:19302' }
+                ]
+            }
+        });
         let conn = null;
         let call = null;
         let localStream = null;
