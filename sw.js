@@ -3,20 +3,28 @@ const CACHE_NAME = 'ghostlink-v1';
 const ASSETS_TO_CACHE = [
     '/',
     '/index.html',
-    '/manifest.json',
+    '/manifest.json'
+];
+
+// External CDN assets to cache opportunistically
+const CDN_ASSETS = [
     'https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js',
     'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;700&display=swap',
     'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css'
 ];
 
-// Install event - cache assets
+// Install event - cache core assets
 self.addEventListener('install', (event) => {
     event.waitUntil(
         caches.open(CACHE_NAME)
             .then((cache) => {
+                // Cache local assets only (these are guaranteed to succeed)
                 return cache.addAll(ASSETS_TO_CACHE);
             })
             .then(() => self.skipWaiting())
+            .catch((err) => {
+                console.log('Cache installation failed:', err);
+            })
     );
 });
 
@@ -45,18 +53,28 @@ self.addEventListener('fetch', (event) => {
                     return response;
                 }
                 // Otherwise fetch from network
-                return fetch(event.request).then((response) => {
-                    // Don't cache non-successful responses or non-GET requests
-                    if (!response || response.status !== 200 || event.request.method !== 'GET') {
+                return fetch(event.request)
+                    .then((response) => {
+                        // Don't cache non-successful responses or non-GET requests
+                        if (!response || !response.ok || event.request.method !== 'GET') {
+                            return response;
+                        }
+                        // Cache the response
+                        const responseToCache = response.clone();
+                        caches.open(CACHE_NAME).then((cache) => {
+                            cache.put(event.request, responseToCache);
+                        });
                         return response;
-                    }
-                    // Cache the response
-                    const responseToCache = response.clone();
-                    caches.open(CACHE_NAME).then((cache) => {
-                        cache.put(event.request, responseToCache);
+                    })
+                    .catch((err) => {
+                        // Network failed, return a simple offline response for HTML requests
+                        if (event.request.headers.get('accept')?.includes('text/html')) {
+                            return new Response('<html><body><h1>GhostLink Offline</h1><p>Please check your internet connection.</p></body></html>', {
+                                headers: { 'Content-Type': 'text/html' }
+                            });
+                        }
+                        throw err;
                     });
-                    return response;
-                });
             })
     );
 });

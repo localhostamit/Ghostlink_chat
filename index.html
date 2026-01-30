@@ -3,13 +3,13 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
-    <meta name="theme-color" content="#075e54">
+    <meta name="theme-color" content="#6366f1">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="description" content="GhostLink - Private peer-to-peer encrypted messaging with file, image, video and code sharing">
     <meta name="mobile-web-app-capable" content="yes">
     <link rel="manifest" href="manifest.json">
-    <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'%3E%3Crect fill='%23075e54' width='192' height='192' rx='32'/%3E%3Ctext x='96' y='130' text-anchor='middle' font-size='120' fill='white'%3E👻%3C/text%3E%3C/svg%3E">
+    <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'%3E%3Crect fill='%236366f1' width='192' height='192' rx='32'/%3E%3Ctext x='96' y='130' text-anchor='middle' font-size='120' fill='white'%3E👻%3C/text%3E%3C/svg%3E">
     <title>GhostLink | Secure P2P Chat</title>
     <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
@@ -1473,20 +1473,20 @@
             </div>
 
             <!-- Attachment Menu -->
-            <div id="attachment-menu" class="attachment-menu">
-                <button class="attachment-btn image-btn" onclick="triggerFileInput('image')">
+            <div id="attachment-menu" class="attachment-menu" role="menu" aria-label="Attachment options">
+                <button class="attachment-btn image-btn" onclick="triggerFileInput('image')" role="menuitem" aria-label="Share an image">
                     <i class="fa-solid fa-image"></i>
                     <span>Image</span>
                 </button>
-                <button class="attachment-btn video-btn" onclick="triggerFileInput('video')">
+                <button class="attachment-btn video-btn" onclick="triggerFileInput('video')" role="menuitem" aria-label="Share a video">
                     <i class="fa-solid fa-video"></i>
                     <span>Video</span>
                 </button>
-                <button class="attachment-btn file-btn" onclick="triggerFileInput('file')">
+                <button class="attachment-btn file-btn" onclick="triggerFileInput('file')" role="menuitem" aria-label="Share a file">
                     <i class="fa-solid fa-file"></i>
                     <span>File</span>
                 </button>
-                <button class="attachment-btn code-btn" onclick="openCodeModal()">
+                <button class="attachment-btn code-btn" onclick="openCodeModal()" role="menuitem" aria-label="Share code snippet">
                     <i class="fa-solid fa-code"></i>
                     <span>Code</span>
                 </button>
@@ -1508,16 +1508,16 @@
     </div>
 
     <!-- Code Modal -->
-    <div id="code-modal" class="code-modal-overlay">
+    <div id="code-modal" class="code-modal-overlay" role="dialog" aria-modal="true" aria-labelledby="code-modal-title">
         <div class="code-modal">
             <div class="code-modal-header">
-                <h3><i class="fa-solid fa-code"></i> Share Code</h3>
-                <button class="code-modal-close" onclick="closeCodeModal()">
+                <h3 id="code-modal-title"><i class="fa-solid fa-code"></i> Share Code</h3>
+                <button class="code-modal-close" onclick="closeCodeModal()" aria-label="Close dialog">
                     <i class="fa-solid fa-times"></i>
                 </button>
             </div>
             <div class="code-modal-body">
-                <select id="code-language">
+                <select id="code-language" aria-label="Select programming language">
                     <option value="javascript">JavaScript</option>
                     <option value="python">Python</option>
                     <option value="java">Java</option>
@@ -1553,11 +1553,11 @@
     </div>
 
     <!-- Image Preview Modal -->
-    <div id="image-preview" class="image-preview-overlay" onclick="closeImagePreview()">
-        <button class="image-preview-close" onclick="closeImagePreview()">
+    <div id="image-preview" class="image-preview-overlay" role="dialog" aria-modal="true" aria-label="Image preview" onclick="closeImagePreview()">
+        <button class="image-preview-close" onclick="event.stopPropagation(); closeImagePreview();" aria-label="Close image preview">
             <i class="fa-solid fa-times"></i>
         </button>
-        <img id="preview-image" src="" alt="Preview">
+        <img id="preview-image" src="" alt="Preview of shared image">
     </div>
 
     <!-- PWA Install Banner -->
@@ -1956,12 +1956,27 @@
             document.getElementById(type + '-input').click();
         }
 
+        // Valid programming languages for code sharing
+        const VALID_LANGUAGES = ['javascript', 'python', 'java', 'cpp', 'c', 'csharp', 'go', 'rust', 
+            'typescript', 'php', 'ruby', 'swift', 'kotlin', 'html', 'css', 'sql', 'shell', 'json', 
+            'xml', 'yaml', 'markdown', 'plaintext'];
+        
+        // Maximum file size (50MB)
+        const MAX_FILE_SIZE = 50 * 1024 * 1024;
+
         function handleFileSelect(event, type) {
             const file = event.target.files[0];
             if (!file) return;
             
             if (!conn || !conn.open) {
                 alert("⚠️ Connect to a peer first!");
+                event.target.value = '';
+                return;
+            }
+            
+            // Check file size
+            if (file.size > MAX_FILE_SIZE) {
+                alert("⚠️ File too large! Maximum size is 50MB.");
                 event.target.value = '';
                 return;
             }
@@ -1998,7 +2013,7 @@
                 const img = document.createElement('img');
                 img.src = data.data;
                 img.className = 'msg-image';
-                img.alt = data.fileName;
+                img.alt = data.fileName || 'Shared image';
                 img.onclick = () => openImagePreview(data.data);
                 div.appendChild(img);
             } else if (data.fileType === 'video') {
@@ -2009,11 +2024,13 @@
                 video.preload = 'metadata';
                 div.appendChild(video);
             } else if (data.fileType === 'code') {
+                // Validate and sanitize language
+                const sanitizedLang = VALID_LANGUAGES.includes(data.language) ? data.language : 'plaintext';
                 const codeBlock = document.createElement('div');
                 codeBlock.className = 'msg-code';
                 codeBlock.innerHTML = `
                     <div class="msg-code-header">
-                        <span class="msg-code-lang">${data.language}</span>
+                        <span class="msg-code-lang">${escapeHtml(sanitizedLang)}</span>
                         <button class="msg-code-copy" onclick="copyCode(this)">
                             <i class="fa-solid fa-copy"></i> Copy
                         </button>
