@@ -2218,7 +2218,8 @@
                     ui.usernameDisplay.innerText = myUsername;
                 }
             } catch (e) {
-                // ui not yet initialized, update via DOM
+                // Expected: ui not yet initialized (temporal dead zone), will fallback to DOM
+                // Unexpected errors will be caught but UI will still update via DOM below
             }
             const usernameEl = document.getElementById('my-username');
             if (usernameEl) usernameEl.innerText = myUsername;
@@ -2335,7 +2336,7 @@
 
         // 2. Init PeerJS with optimized configuration
         const peer = new Peer(mySimpleId, {
-            debug: 0, // Disable debug logging for faster initialization
+            debug: 0, // Disable debug logging to reduce console output
             config: {
                 iceServers: [
                     { urls: 'stun:stun.l.google.com:19302' },
