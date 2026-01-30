@@ -3,56 +3,72 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
-    <meta name="theme-color" content="#075e54">
+    <meta name="theme-color" content="#6366f1">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="description" content="GhostLink - Private peer-to-peer encrypted messaging with file, image, video and code sharing">
+    <meta name="mobile-web-app-capable" content="yes">
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'%3E%3Crect fill='%236366f1' width='192' height='192' rx='32'/%3E%3Ctext x='96' y='130' text-anchor='middle' font-size='120' fill='white'%3E👻%3C/text%3E%3C/svg%3E">
     <title>GhostLink | Secure P2P Chat</title>
-    <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
+    <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js" integrity="sha384-CAQKX5mvqGSk5c3YZD09A4HgJ1PiVRQFVqNLmD5BZDQ7rD4H+yRdmwSBCMxr9/xS" crossorigin="anonymous"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css" integrity="sha512-Jk4AqjWsdSzSWCSuQTfYRIF84Rq/eV0G2+tu07byYwHcbTGfdmLrHjUSwvzp5HvbiqK4ibmNwdcG49Y5RGYPTg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js" integrity="sha512-D9gUyxqja7hBtkWpPWGt9wfbfaMGVt9gnyCvYa+jojwwPHLCzUm5i8rpk7vD7wNee9bA35eYIjobYPaQuKS1MQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     
     <style>
-        /* --- PROFESSIONAL WHATSAPP/TELEGRAM INSPIRED THEME --- */
+        /* --- GHOSTLINK UNIQUE PROFESSIONAL THEME --- */
         :root {
-            /* WhatsApp-inspired colors */
+            /* GhostLink signature colors */
+            --ghost-purple: #6366f1;
+            --ghost-purple-light: #818cf8;
+            --ghost-purple-dark: #4f46e5;
+            --ghost-cyan: #06b6d4;
+            --ghost-cyan-light: #22d3ee;
+            
+            /* Accent colors */
             --wa-green: #25d366;
             --wa-dark-green: #128c7e;
             --wa-teal: #075e54;
             --wa-light-green: #dcf8c6;
-            
-            /* Telegram-inspired colors */
             --tg-blue: #0088cc;
             --tg-light-blue: #64b5f6;
             
-            /* Modern UI colors */
-            --bg-dark: #0b141a;
-            --bg-chat: #0b141a;
-            --panel-bg-dark: #111b21;
-            --panel-secondary: #1f2c34;
-            --border-dark: #233138;
-            --bubble-out: #005c4b;
-            --bubble-in: #1f2c34;
+            /* Modern Dark UI colors */
+            --bg-dark: #0a0a0f;
+            --bg-chat: #0d0d14;
+            --panel-bg-dark: #12121a;
+            --panel-secondary: #1a1a24;
+            --border-dark: #2a2a38;
+            --bubble-out: #4f46e5;
+            --bubble-in: #1e1e2a;
             
-            --primary: #00a884;
-            --primary-hover: #02c495;
-            --primary-light: rgba(0, 168, 132, 0.1);
-            --accent: #00a884;
+            --primary: #6366f1;
+            --primary-hover: #818cf8;
+            --primary-light: rgba(99, 102, 241, 0.15);
+            --accent: #06b6d4;
             --danger: #ef4444;
             --danger-hover: #dc2626;
             --success: #22c55e;
             --warning: #f59e0b;
             
-            --text-main: #e9edef;
-            --text-muted: #8696a0;
-            --text-bubble: #e9edef;
+            --text-main: #f0f0f5;
+            --text-muted: #8b8ba0;
+            --text-bubble: #f0f0f5;
             
-            --shadow-sm: 0 1px 3px rgba(0,0,0,0.2);
-            --shadow-md: 0 4px 12px rgba(0,0,0,0.25);
-            --shadow-lg: 0 8px 24px rgba(0,0,0,0.35);
+            --shadow-sm: 0 1px 3px rgba(0,0,0,0.3);
+            --shadow-md: 0 4px 12px rgba(0,0,0,0.4);
+            --shadow-lg: 0 8px 24px rgba(0,0,0,0.5);
+            --glow-primary: 0 0 20px rgba(99, 102, 241, 0.3);
+            --glow-accent: 0 0 20px rgba(6, 182, 212, 0.3);
             
             /* Gradients */
-            --gradient-primary: linear-gradient(135deg, #00a884 0%, #02c495 100%);
-            --gradient-header: linear-gradient(135deg, #075e54 0%, #128c7e 100%);
+            --gradient-primary: linear-gradient(135deg, #6366f1 0%, #818cf8 100%);
+            --gradient-header: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            --gradient-accent: linear-gradient(135deg, #06b6d4 0%, #22d3ee 100%);
+            --gradient-mesh: radial-gradient(ellipse at 20% 0%, rgba(99, 102, 241, 0.15) 0%, transparent 50%),
+                            radial-gradient(ellipse at 80% 100%, rgba(6, 182, 212, 0.1) 0%, transparent 50%);
         }
 
         body {
@@ -444,21 +460,20 @@
         .btn-connect { 
             background: var(--gradient-primary);
             color: #fff;
-            box-shadow: 0 2px 8px rgba(0, 168, 132, 0.3);
+            box-shadow: 0 2px 8px rgba(99, 102, 241, 0.3);
         }
         .btn-connect:hover {
-            box-shadow: 0 4px 16px rgba(0, 168, 132, 0.4);
+            box-shadow: 0 4px 16px rgba(99, 102, 241, 0.4);
         }
         .btn-video { 
-            background: var(--tg-blue);
+            background: var(--gradient-accent);
             color: #fff;
             padding: 14px;
             font-size: 14px;
-            box-shadow: 0 2px 8px rgba(0, 136, 204, 0.3);
+            box-shadow: 0 2px 8px rgba(6, 182, 212, 0.3);
         }
         .btn-video:hover {
-            background: #0099dd;
-            box-shadow: 0 4px 16px rgba(0, 136, 204, 0.4);
+            box-shadow: 0 4px 16px rgba(6, 182, 212, 0.4);
         }
         .btn-icon { 
             width: auto; 
@@ -895,6 +910,429 @@
         .sidebar-close {
             display: none;
         }
+        
+        /* --- FILE SHARING STYLES --- */
+        .attachment-menu {
+            position: absolute;
+            bottom: 70px;
+            left: 16px;
+            background: var(--panel-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 12px;
+            display: none;
+            flex-direction: column;
+            gap: 8px;
+            box-shadow: var(--shadow-lg);
+            z-index: 50;
+            animation: slideUpMenu 0.2s ease;
+        }
+        @keyframes slideUpMenu {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .attachment-menu.active {
+            display: flex;
+        }
+        .attachment-btn {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            border-radius: 12px;
+            background: transparent;
+            border: none;
+            color: var(--text);
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            width: auto;
+        }
+        .attachment-btn:hover {
+            background: var(--primary-light);
+            transform: none;
+        }
+        .attachment-btn i {
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            font-size: 16px;
+        }
+        .attachment-btn.image-btn i { background: linear-gradient(135deg, #ec4899, #f472b6); color: white; }
+        .attachment-btn.video-btn i { background: linear-gradient(135deg, #8b5cf6, #a78bfa); color: white; }
+        .attachment-btn.file-btn i { background: linear-gradient(135deg, #06b6d4, #22d3ee); color: white; }
+        .attachment-btn.code-btn i { background: linear-gradient(135deg, #f59e0b, #fbbf24); color: white; }
+        
+        .btn-attach {
+            width: 48px;
+            height: 48px;
+            padding: 0;
+            border-radius: 50%;
+            font-size: 18px;
+            background: var(--panel-secondary);
+            color: var(--text);
+            border: 1px solid var(--border-color);
+            flex-shrink: 0;
+        }
+        .btn-attach:hover {
+            background: var(--primary-light);
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+        
+        /* Message Media Styles */
+        .msg-image {
+            max-width: 280px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+        }
+        .msg-image:hover {
+            transform: scale(1.02);
+        }
+        .msg-video {
+            max-width: 320px;
+            border-radius: 8px;
+            max-height: 240px;
+        }
+        .msg-file {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px;
+            background: rgba(0,0,0,0.2);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.2s ease;
+        }
+        .msg-file:hover {
+            background: rgba(0,0,0,0.3);
+        }
+        .msg-file-icon {
+            width: 40px;
+            height: 40px;
+            background: var(--gradient-accent);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 18px;
+        }
+        .msg-file-info h5 {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text);
+            margin-bottom: 2px;
+        }
+        .msg-file-info span {
+            font-size: 11px;
+            color: var(--text-muted);
+        }
+        
+        /* Code Block Styles */
+        .msg-code {
+            background: #1e1e2e;
+            border-radius: 8px;
+            overflow: hidden;
+            max-width: 100%;
+        }
+        .msg-code-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 8px 12px;
+            background: rgba(0,0,0,0.3);
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        .msg-code-lang {
+            font-size: 11px;
+            color: var(--ghost-cyan);
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        .msg-code-copy {
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            width: auto;
+        }
+        .msg-code-copy:hover {
+            background: rgba(255,255,255,0.1);
+            color: var(--text);
+            transform: none;
+        }
+        .msg-code pre {
+            margin: 0;
+            padding: 12px;
+            overflow-x: auto;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 13px;
+            line-height: 1.5;
+        }
+        .msg-code code {
+            font-family: 'JetBrains Mono', monospace;
+        }
+        
+        /* Code Modal */
+        .code-modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            padding: 20px;
+            backdrop-filter: blur(8px);
+        }
+        .code-modal-overlay.active {
+            display: flex;
+        }
+        .code-modal {
+            background: var(--panel);
+            border-radius: 16px;
+            max-width: 600px;
+            width: 100%;
+            max-height: 80vh;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            animation: slideUp 0.3s ease;
+            border: 1px solid var(--border-color);
+        }
+        .code-modal-header {
+            padding: 16px 20px;
+            background: var(--panel-secondary);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid var(--border-color);
+        }
+        .code-modal-header h3 {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text);
+        }
+        .code-modal-close {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            padding: 0;
+        }
+        .code-modal-close:hover {
+            background: rgba(255,255,255,0.1);
+            color: var(--text);
+            transform: none;
+        }
+        .code-modal-body {
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            overflow-y: auto;
+        }
+        .code-modal-body select {
+            padding: 12px 16px;
+            background: var(--bg);
+            border: 1px solid var(--border-color);
+            color: var(--text);
+            border-radius: 8px;
+            font-size: 14px;
+            cursor: pointer;
+        }
+        .code-modal-body select:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+        .code-modal-body textarea {
+            padding: 12px 16px;
+            background: var(--bg);
+            border: 1px solid var(--border-color);
+            color: var(--text);
+            border-radius: 8px;
+            font-size: 14px;
+            font-family: 'JetBrains Mono', monospace;
+            resize: vertical;
+            min-height: 200px;
+        }
+        .code-modal-body textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+        .code-modal-footer {
+            padding: 12px 16px;
+            background: var(--panel-secondary);
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+            border-top: 1px solid var(--border-color);
+        }
+        .code-modal-footer button {
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-size: 14px;
+            width: auto;
+        }
+        
+        /* Image Preview Modal */
+        .image-preview-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.95);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            padding: 20px;
+            cursor: zoom-out;
+        }
+        .image-preview-overlay.active {
+            display: flex;
+        }
+        .image-preview-overlay img {
+            max-width: 90vw;
+            max-height: 90vh;
+            border-radius: 8px;
+            object-fit: contain;
+        }
+        .image-preview-close {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.1);
+            border: none;
+            color: white;
+            cursor: pointer;
+            font-size: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0;
+        }
+        .image-preview-close:hover {
+            background: rgba(255,255,255,0.2);
+            transform: none;
+        }
+        
+        /* PWA Install Banner */
+        .install-banner {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: var(--gradient-primary);
+            padding: 12px 20px;
+            display: none;
+            align-items: center;
+            justify-content: space-between;
+            z-index: 1000;
+            box-shadow: 0 -4px 20px rgba(0,0,0,0.3);
+        }
+        .install-banner.active {
+            display: flex;
+        }
+        .install-banner-text {
+            color: white;
+            font-size: 14px;
+            font-weight: 500;
+        }
+        .install-banner-text i {
+            margin-right: 8px;
+        }
+        .install-banner-buttons {
+            display: flex;
+            gap: 10px;
+        }
+        .install-banner button {
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+            width: auto;
+        }
+        .install-banner .btn-install {
+            background: white;
+            color: var(--primary);
+        }
+        .install-banner .btn-dismiss {
+            background: rgba(255,255,255,0.2);
+            color: white;
+        }
+        
+        /* Mesh Background */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--gradient-mesh);
+            pointer-events: none;
+            z-index: -1;
+        }
+        
+        /* Glowing effects */
+        .panel:hover {
+            box-shadow: var(--glow-primary);
+        }
+        .my-id-display {
+            box-shadow: var(--glow-primary);
+        }
+        .my-id-display:hover {
+            box-shadow: 0 0 30px rgba(99, 102, 241, 0.4);
+        }
+        
+        /* Enhanced message styles */
+        .msg-me::before {
+            background: var(--bubble-out);
+        }
+        .msg-peer::before {
+            background: var(--bubble-in);
+        }
+        
+        @media (max-width: 768px) {
+            .attachment-menu {
+                bottom: 65px;
+                left: 10px;
+            }
+            .msg-code pre {
+                font-size: 12px;
+            }
+            .code-modal {
+                max-height: 90vh;
+            }
+        }
     </style>
 </head>
 <body>
@@ -1034,10 +1472,103 @@
                 <div class="sys-msg">🔒 Welcome to GhostLink! Your messages are P2P encrypted and never stored.</div>
             </div>
 
+            <!-- Attachment Menu -->
+            <div id="attachment-menu" class="attachment-menu" role="menu" aria-label="Attachment options">
+                <button class="attachment-btn image-btn" onclick="triggerFileInput('image')" role="menuitem" aria-label="Share an image">
+                    <i class="fa-solid fa-image"></i>
+                    <span>Image</span>
+                </button>
+                <button class="attachment-btn video-btn" onclick="triggerFileInput('video')" role="menuitem" aria-label="Share a video">
+                    <i class="fa-solid fa-video"></i>
+                    <span>Video</span>
+                </button>
+                <button class="attachment-btn file-btn" onclick="triggerFileInput('file')" role="menuitem" aria-label="Share a file">
+                    <i class="fa-solid fa-file"></i>
+                    <span>File</span>
+                </button>
+                <button class="attachment-btn code-btn" onclick="openCodeModal()" role="menuitem" aria-label="Share code snippet">
+                    <i class="fa-solid fa-code"></i>
+                    <span>Code</span>
+                </button>
+            </div>
+
             <div class="input-bar">
+                <button class="btn-attach" onclick="toggleAttachmentMenu()" aria-label="Attach file">
+                    <i class="fa-solid fa-plus"></i>
+                </button>
                 <input type="text" id="msg-input" placeholder="Type a message..." onkeypress="handleEnter(event)" aria-label="Message input">
                 <button class="btn-connect" onclick="sendMessage()" aria-label="Send message"><i class="fa-solid fa-paper-plane"></i></button>
             </div>
+            
+            <!-- Hidden file inputs -->
+            <input type="file" id="image-input" accept="image/*" style="display:none" onchange="handleFileSelect(event, 'image')">
+            <input type="file" id="video-input" accept="video/*" style="display:none" onchange="handleFileSelect(event, 'video')">
+            <input type="file" id="file-input" style="display:none" onchange="handleFileSelect(event, 'file')">
+        </div>
+    </div>
+
+    <!-- Code Modal -->
+    <div id="code-modal" class="code-modal-overlay" role="dialog" aria-modal="true" aria-labelledby="code-modal-title">
+        <div class="code-modal">
+            <div class="code-modal-header">
+                <h3 id="code-modal-title"><i class="fa-solid fa-code"></i> Share Code</h3>
+                <button class="code-modal-close" onclick="closeCodeModal()" aria-label="Close dialog">
+                    <i class="fa-solid fa-times"></i>
+                </button>
+            </div>
+            <div class="code-modal-body">
+                <select id="code-language" aria-label="Select programming language">
+                    <option value="javascript">JavaScript</option>
+                    <option value="python">Python</option>
+                    <option value="java">Java</option>
+                    <option value="cpp">C++</option>
+                    <option value="c">C</option>
+                    <option value="csharp">C#</option>
+                    <option value="go">Go</option>
+                    <option value="rust">Rust</option>
+                    <option value="typescript">TypeScript</option>
+                    <option value="php">PHP</option>
+                    <option value="ruby">Ruby</option>
+                    <option value="swift">Swift</option>
+                    <option value="kotlin">Kotlin</option>
+                    <option value="html">HTML</option>
+                    <option value="css">CSS</option>
+                    <option value="sql">SQL</option>
+                    <option value="shell">Shell/Bash</option>
+                    <option value="json">JSON</option>
+                    <option value="xml">XML</option>
+                    <option value="yaml">YAML</option>
+                    <option value="markdown">Markdown</option>
+                    <option value="plaintext">Plain Text</option>
+                </select>
+                <textarea id="code-content" placeholder="Paste your code here..."></textarea>
+            </div>
+            <div class="code-modal-footer">
+                <button class="btn-grey" onclick="closeCodeModal()">Cancel</button>
+                <button class="btn-connect" onclick="sendCode()">
+                    <i class="fa-solid fa-paper-plane"></i> Send Code
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Image Preview Modal -->
+    <div id="image-preview" class="image-preview-overlay" role="dialog" aria-modal="true" aria-label="Image preview" onclick="closeImagePreview()">
+        <button class="image-preview-close" onclick="event.stopPropagation(); closeImagePreview();" aria-label="Close image preview">
+            <i class="fa-solid fa-times"></i>
+        </button>
+        <img id="preview-image" src="" alt="Preview of shared image">
+    </div>
+
+    <!-- PWA Install Banner -->
+    <div id="install-banner" class="install-banner">
+        <span class="install-banner-text">
+            <i class="fa-solid fa-download"></i>
+            Install GhostLink for the best experience
+        </span>
+        <div class="install-banner-buttons">
+            <button class="btn-dismiss" onclick="dismissInstallBanner()">Later</button>
+            <button class="btn-install" onclick="installPWA()">Install</button>
         </div>
     </div>
 
@@ -1243,13 +1774,18 @@
             });
             
             c.on('data', (data) => {
-                // Check if it's a system message (username exchange)
+                // Check if it's a system message or file/code message
                 try {
                     const parsed = JSON.parse(data);
                     if (parsed.type === 'username') {
                         peerUsername = parsed.username;
                         updateChatHeader(peerUsername, c.peer);
                         logSystem("👋 " + peerUsername + " joined the chat");
+                        return;
+                    }
+                    if (parsed.type === 'file') {
+                        // Handle file/image/video/code messages
+                        addMediaMessage(parsed, 'peer', peerUsername);
                         return;
                     }
                 } catch (e) {
@@ -1408,6 +1944,282 @@
                 sendMessage();
             }
         }
+
+        // --- FILE SHARING FUNCTIONS ---
+        function toggleAttachmentMenu() {
+            const menu = document.getElementById('attachment-menu');
+            menu.classList.toggle('active');
+        }
+
+        function triggerFileInput(type) {
+            document.getElementById('attachment-menu').classList.remove('active');
+            document.getElementById(type + '-input').click();
+        }
+
+        // Valid programming languages for code sharing
+        const VALID_LANGUAGES = ['javascript', 'python', 'java', 'cpp', 'c', 'csharp', 'go', 'rust', 
+            'typescript', 'php', 'ruby', 'swift', 'kotlin', 'html', 'css', 'sql', 'shell', 'json', 
+            'xml', 'yaml', 'markdown', 'plaintext'];
+        
+        // Maximum file size (50MB)
+        const MAX_FILE_SIZE = 50 * 1024 * 1024;
+
+        function handleFileSelect(event, type) {
+            const file = event.target.files[0];
+            if (!file) return;
+            
+            if (!conn || !conn.open) {
+                alert("⚠️ Connect to a peer first!");
+                event.target.value = '';
+                return;
+            }
+            
+            // Check file size
+            if (file.size > MAX_FILE_SIZE) {
+                alert("⚠️ File too large! Maximum size is 50MB.");
+                event.target.value = '';
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const data = {
+                    type: 'file',
+                    fileType: type,
+                    fileName: file.name,
+                    fileSize: file.size,
+                    mimeType: file.type,
+                    data: e.target.result
+                };
+                conn.send(JSON.stringify(data));
+                addMediaMessage(data, 'me');
+            };
+            reader.readAsDataURL(file);
+            event.target.value = '';
+        }
+
+        function addMediaMessage(data, type, senderName = null) {
+            const div = document.createElement('div');
+            div.className = type === 'me' ? 'msg msg-me' : 'msg msg-peer';
+            
+            if (type === 'peer' && senderName) {
+                const sender = document.createElement('div');
+                sender.className = 'msg-sender';
+                sender.innerText = '@' + senderName;
+                div.appendChild(sender);
+            }
+
+            if (data.fileType === 'image') {
+                const img = document.createElement('img');
+                img.src = data.data;
+                img.className = 'msg-image';
+                img.alt = data.fileName || 'Shared image';
+                img.onclick = () => openImagePreview(data.data);
+                div.appendChild(img);
+            } else if (data.fileType === 'video') {
+                const video = document.createElement('video');
+                video.src = data.data;
+                video.className = 'msg-video';
+                video.controls = true;
+                video.preload = 'metadata';
+                div.appendChild(video);
+            } else if (data.fileType === 'code') {
+                // Validate and sanitize language
+                const sanitizedLang = VALID_LANGUAGES.includes(data.language) ? data.language : 'plaintext';
+                const codeBlock = document.createElement('div');
+                codeBlock.className = 'msg-code';
+                codeBlock.innerHTML = `
+                    <div class="msg-code-header">
+                        <span class="msg-code-lang">${escapeHtml(sanitizedLang)}</span>
+                        <button class="msg-code-copy" onclick="copyCode(this)">
+                            <i class="fa-solid fa-copy"></i> Copy
+                        </button>
+                    </div>
+                    <pre><code class="language-${data.language}">${escapeHtml(data.code)}</code></pre>
+                `;
+                div.appendChild(codeBlock);
+                // Apply syntax highlighting
+                hljs.highlightElement(codeBlock.querySelector('code'));
+            } else {
+                // Generic file
+                const fileDiv = document.createElement('div');
+                fileDiv.className = 'msg-file';
+                fileDiv.innerHTML = `
+                    <div class="msg-file-icon">
+                        <i class="fa-solid fa-file"></i>
+                    </div>
+                    <div class="msg-file-info">
+                        <h5>${escapeHtml(data.fileName)}</h5>
+                        <span>${formatFileSize(data.fileSize)}</span>
+                    </div>
+                `;
+                fileDiv.onclick = () => downloadFile(data);
+                div.appendChild(fileDiv);
+            }
+
+            // Add meta (timestamp + status)
+            const meta = document.createElement('div');
+            meta.className = 'msg-meta';
+            const timestamp = document.createElement('span');
+            timestamp.className = 'msg-timestamp';
+            timestamp.innerText = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            meta.appendChild(timestamp);
+            
+            if (type === 'me') {
+                const status = document.createElement('span');
+                status.className = 'msg-status';
+                status.innerHTML = '<i class="fa-solid fa-check-double"></i>';
+                meta.appendChild(status);
+            }
+            
+            div.appendChild(meta);
+            ui.msgs.appendChild(div);
+            ui.msgs.scrollTop = ui.msgs.scrollHeight;
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+
+        function downloadFile(data) {
+            const link = document.createElement('a');
+            link.href = data.data;
+            link.download = data.fileName;
+            link.click();
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.closest('.msg-code');
+            const code = codeBlock.querySelector('code').textContent;
+            navigator.clipboard.writeText(code).then(() => {
+                const originalText = button.innerHTML;
+                button.innerHTML = '<i class="fa-solid fa-check"></i> Copied!';
+                setTimeout(() => {
+                    button.innerHTML = originalText;
+                }, 2000);
+            });
+        }
+
+        // --- CODE MODAL FUNCTIONS ---
+        function openCodeModal() {
+            document.getElementById('attachment-menu').classList.remove('active');
+            document.getElementById('code-modal').classList.add('active');
+            document.getElementById('code-content').focus();
+        }
+
+        function closeCodeModal() {
+            document.getElementById('code-modal').classList.remove('active');
+            document.getElementById('code-content').value = '';
+        }
+
+        function sendCode() {
+            const language = document.getElementById('code-language').value;
+            const code = document.getElementById('code-content').value.trim();
+            
+            if (!code) {
+                alert("Please enter some code to share.");
+                return;
+            }
+            
+            if (!conn || !conn.open) {
+                alert("⚠️ Connect to a peer first!");
+                return;
+            }
+
+            const data = {
+                type: 'file',
+                fileType: 'code',
+                language: language,
+                code: code
+            };
+            
+            conn.send(JSON.stringify(data));
+            addMediaMessage(data, 'me');
+            closeCodeModal();
+        }
+
+        // --- IMAGE PREVIEW FUNCTIONS ---
+        function openImagePreview(src) {
+            document.getElementById('preview-image').src = src;
+            document.getElementById('image-preview').classList.add('active');
+        }
+
+        function closeImagePreview() {
+            document.getElementById('image-preview').classList.remove('active');
+        }
+
+        // --- PWA INSTALLATION ---
+        let deferredPrompt;
+        
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            // Show install banner after a delay
+            setTimeout(() => {
+                const banner = document.getElementById('install-banner');
+                if (!localStorage.getItem('pwa-install-dismissed')) {
+                    banner.classList.add('active');
+                }
+            }, 3000);
+        });
+
+        function installPWA() {
+            const banner = document.getElementById('install-banner');
+            banner.classList.remove('active');
+            
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                deferredPrompt.userChoice.then((choiceResult) => {
+                    if (choiceResult.outcome === 'accepted') {
+                        logSystem('🎉 GhostLink installed successfully!');
+                    }
+                    deferredPrompt = null;
+                });
+            }
+        }
+
+        function dismissInstallBanner() {
+            document.getElementById('install-banner').classList.remove('active');
+            localStorage.setItem('pwa-install-dismissed', 'true');
+        }
+
+        // --- SERVICE WORKER REGISTRATION ---
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js')
+                    .then(reg => console.log('Service Worker registered'))
+                    .catch(err => console.log('Service Worker registration failed:', err));
+            });
+        }
+
+        // Close attachment menu when clicking outside
+        document.addEventListener('click', (e) => {
+            const menu = document.getElementById('attachment-menu');
+            const attachBtn = document.querySelector('.btn-attach');
+            if (menu.classList.contains('active') && 
+                !menu.contains(e.target) && 
+                !attachBtn.contains(e.target)) {
+                menu.classList.remove('active');
+            }
+        });
+
+        // Handle Escape key for modals
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                closeCodeModal();
+                closeImagePreview();
+            }
+        });
     </script>
 </body>
 </html>
