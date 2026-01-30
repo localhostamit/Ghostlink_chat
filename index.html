@@ -9,25 +9,46 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
-        /* --- CYBERPUNK THEME --- */
+        /* --- PROFESSIONAL MODERN THEME --- */
         :root {
-            --bg-color: #050505;
-            --panel-bg: #111;
-            --border: #333;
-            --primary: #00ff41;        /* Matrix Green */
-            --secondary: #008F11;
-            --accent: #00b8ff;         /* Cyber Blue */
-            --danger: #ff0055;
-            --text-main: #eee;
-            --text-muted: #888;
+            --bg-light: #f5f5f5;
+            --bg-dark: #0d1117;
+            --panel-bg: #ffffff;
+            --panel-bg-dark: #161b22;
+            --border: #e1e4e8;
+            --border-dark: #30363d;
+            --primary: #0969da;        /* Modern Blue */
+            --primary-hover: #0550ae;
+            --primary-light: #ddf4ff;
+            --secondary: #6e7781;
+            --accent: #0969da;
+            --danger: #d1242f;
+            --danger-hover: #a40e26;
+            --success: #1a7f37;
+            --text-main: #24292f;
+            --text-main-dark: #e6edf3;
+            --text-muted: #57606a;
+            --text-muted-dark: #8b949e;
+            --shadow-sm: 0 1px 3px rgba(0,0,0,0.08);
+            --shadow-md: 0 4px 12px rgba(0,0,0,0.1);
+            --shadow-lg: 0 8px 24px rgba(0,0,0,0.15);
+        }
+
+        /* Dark mode by default - can be toggled later */
+        body {
+            --bg: var(--bg-dark);
+            --panel: var(--panel-bg-dark);
+            --border-color: var(--border-dark);
+            --text: var(--text-main-dark);
+            --text-secondary: var(--text-muted-dark);
         }
 
         * { margin:0; padding:0; box-sizing:border-box; }
         
         body {
-            font-family: 'JetBrains Mono', monospace;
-            background-color: var(--bg-color);
-            color: var(--text-main);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica', 'Arial', sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
             height: 100vh;
             display: flex;
             flex-direction: column;
@@ -36,132 +57,280 @@
 
         /* --- 1. HEADER --- */
         .header {
-            padding: 0 15px;
-            background: #000;
-            border-bottom: 1px solid var(--border);
+            padding: 0 20px;
+            background: var(--panel);
+            border-bottom: 1px solid var(--border-color);
             display: flex;
             justify-content: space-between;
             align-items: center;
-            height: 50px;
+            height: 60px;
             flex-shrink: 0;
+            box-shadow: var(--shadow-sm);
         }
-        .logo { font-size: 18px; font-weight: bold; color: var(--primary); letter-spacing: 1px; }
-        .logo span { font-size: 11px; color: var(--text-muted); }
-        .status-badge { font-size: 11px; padding: 3px 8px; border-radius: 4px; background: #222; color: #888; }
-        .status-badge.online { background: rgba(0, 255, 65, 0.2); color: var(--primary); border: 1px solid var(--secondary); }
+        .logo { 
+            font-size: 20px; 
+            font-weight: 600; 
+            color: var(--primary); 
+            letter-spacing: -0.5px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .logo i { font-size: 24px; }
+        .logo span { 
+            font-size: 12px; 
+            color: var(--text-secondary); 
+            font-weight: 400;
+            background: rgba(9, 105, 218, 0.1);
+            padding: 2px 6px;
+            border-radius: 4px;
+        }
+        .status-badge { 
+            font-size: 13px; 
+            padding: 6px 12px; 
+            border-radius: 20px; 
+            background: var(--bg); 
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-weight: 500;
+        }
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--text-muted);
+        }
+        .status-badge.online .status-dot { 
+            background: var(--success);
+            box-shadow: 0 0 0 2px rgba(26, 127, 55, 0.2);
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
 
         /* --- 2. MAIN CONTENT GRID --- */
         .main-container {
             display: flex;
             flex: 1; 
-            height: calc(100vh - 100px); 
             overflow: hidden;
         }
 
         /* --- SIDEBAR (CONTROLS) --- */
         .sidebar {
-            width: 300px;
-            background: var(--panel-bg);
-            border-right: 1px solid var(--border);
-            padding: 15px;
+            width: 280px;
+            background: var(--panel);
+            border-right: 1px solid var(--border-color);
+            padding: 16px;
             display: flex;
             flex-direction: column;
-            gap: 15px;
+            gap: 16px;
             overflow-y: auto;
+            flex-shrink: 0;
         }
 
         .panel {
-            background: #080808;
-            border: 1px solid var(--border);
-            padding: 12px;
-            border-radius: 6px;
+            background: var(--bg);
+            border: 1px solid var(--border-color);
+            padding: 16px;
+            border-radius: 8px;
+            box-shadow: var(--shadow-sm);
+            transition: all 0.2s ease;
         }
-        .panel h3 { font-size: 10px; color: var(--text-muted); text-transform: uppercase; margin-bottom: 8px; border-bottom: 1px solid #222; padding-bottom: 5px; }
+        .panel:hover {
+            box-shadow: var(--shadow-md);
+        }
+        .panel h3 { 
+            font-size: 11px; 
+            color: var(--text-secondary); 
+            text-transform: uppercase; 
+            margin-bottom: 12px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
 
         /* ID Box */
         .my-id-display {
-            font-size: 32px;
-            color: var(--primary);
+            font-size: 24px;
+            color: var(--text);
             text-align: center;
-            font-weight: bold;
-            padding: 8px;
-            border: 2px dashed var(--secondary);
-            background: rgba(0,0,0,0.5);
-            text-shadow: 0 0 10px rgba(0, 255, 65, 0.2);
-            letter-spacing: 2px;
+            font-weight: 600;
+            padding: 12px;
+            border: 2px solid var(--primary);
+            background: rgba(9, 105, 218, 0.05);
+            border-radius: 8px;
+            letter-spacing: 3px;
+            font-family: 'JetBrains Mono', 'Courier New', monospace;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            position: relative;
+        }
+        .my-id-display:hover {
+            background: rgba(9, 105, 218, 0.1);
+            transform: translateY(-1px);
+        }
+        .my-id-display:active {
+            transform: translateY(0);
+        }
+        .copy-hint {
+            font-size: 10px;
+            color: var(--text-secondary);
+            text-align: center;
+            margin-top: 6px;
+            text-transform: none;
+            letter-spacing: 0;
         }
         
         /* Inputs */
         input {
             width: 100%;
-            padding: 10px;
-            background: #000;
-            border: 1px solid var(--border);
-            color: #fff;
+            padding: 12px;
+            background: var(--bg);
+            border: 1px solid var(--border-color);
+            color: var(--text);
             text-align: center;
             font-family: inherit;
             font-size: 14px;
-            margin-bottom: 8px;
-            border-radius: 4px;
+            margin-bottom: 10px;
+            border-radius: 8px;
+            transition: all 0.2s ease;
         }
-        input:focus { outline: none; border-color: var(--accent); }
+        input:focus { 
+            outline: none; 
+            border-color: var(--primary); 
+            box-shadow: 0 0 0 3px rgba(9, 105, 218, 0.1);
+        }
+        input::placeholder {
+            color: var(--text-secondary);
+        }
 
         /* Buttons */
         button {
             width: 100%;
-            padding: 10px;
+            padding: 12px;
             border: none;
             cursor: pointer;
             font-family: inherit;
-            font-weight: bold;
-            text-transform: uppercase;
-            font-size: 12px;
-            border-radius: 4px;
-            transition: 0.2s;
+            font-weight: 600;
+            font-size: 14px;
+            border-radius: 8px;
+            transition: all 0.2s ease;
             display: flex;
             align-items: center;
             justify-content: center;
             gap: 8px;
         }
-        .btn-connect { background: var(--accent); color: #000; }
-        .btn-video { background: var(--primary); color: #000; margin-bottom: 5px; padding: 12px; font-size: 14px;}
-        .btn-icon { width: auto; flex: 1; padding: 8px; font-size: 16px; }
-        .btn-red { background: var(--danger); color: #fff; }
-        .btn-grey { background: #333; color: #ccc; }
-        
-        .active-btn { background: #fff; color: #000; }
+        button:hover {
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-md);
+        }
+        button:active {
+            transform: translateY(0);
+        }
+        .btn-connect { 
+            background: var(--primary); 
+            color: #fff; 
+        }
+        .btn-connect:hover {
+            background: var(--primary-hover);
+        }
+        .btn-video { 
+            background: var(--success); 
+            color: #fff;
+            padding: 14px;
+            font-size: 15px;
+        }
+        .btn-video:hover {
+            background: #1a6b32;
+        }
+        .btn-icon { 
+            width: auto; 
+            flex: 1; 
+            padding: 10px; 
+            font-size: 18px;
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--text);
+        }
+        .btn-icon:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+        .btn-red { 
+            background: var(--danger); 
+            color: #fff; 
+        }
+        .btn-red:hover {
+            background: var(--danger-hover);
+        }
+        .btn-grey { 
+            background: var(--bg); 
+            color: var(--text);
+            border: 1px solid var(--border-color);
+        }
 
         /* --- CHAT AREA --- */
         .chat-section {
             flex: 1;
             display: flex;
             flex-direction: column;
-            background: #000;
+            background: var(--bg);
             position: relative;
+            overflow: hidden;
         }
 
-        /* Video Overlay */
+        /* Video Area */
         #video-area {
-            background: #050505;
-            border-bottom: 2px solid var(--primary);
+            background: #000;
+            border-bottom: 1px solid var(--border-color);
             display: flex;
             flex-direction: column;
+            flex-shrink: 0;
         }
         .video-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 2px;
-            height: 200px;
+            gap: 4px;
+            padding: 4px;
+            min-height: 240px;
+            max-height: 320px;
         }
-        video { width: 100%; height: 100%; object-fit: cover; background: #111; }
+        video { 
+            width: 100%; 
+            height: 100%; 
+            object-fit: cover; 
+            background: #1a1a1a;
+            border-radius: 8px;
+        }
         
-        /* Video Controls (Mute/Cam) */
+        /* Video Controls */
         .video-controls {
             display: flex;
-            gap: 10px;
-            padding: 10px;
-            background: #111;
+            gap: 8px;
+            padding: 12px;
+            background: rgba(0, 0, 0, 0.7);
             justify-content: center;
+            backdrop-filter: blur(10px);
+        }
+        .video-controls button {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            padding: 0;
+            background: rgba(255, 255, 255, 0.15);
+            color: #fff;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        .video-controls button:hover {
+            background: rgba(255, 255, 255, 0.25);
+            transform: scale(1.05);
+        }
+        .video-controls .btn-red {
+            background: var(--danger);
+        }
+        .video-controls .btn-red:hover {
+            background: var(--danger-hover);
         }
 
         .hidden { display: none !important; }
@@ -170,108 +339,205 @@
         #messages {
             flex: 1;
             overflow-y: auto;
-            padding: 15px;
+            padding: 20px;
             display: flex;
             flex-direction: column;
-            gap: 10px;
-            background-image: radial-gradient(#111 1px, transparent 1px);
-            background-size: 20px 20px;
+            gap: 12px;
+            background: var(--bg);
+        }
+        #messages::-webkit-scrollbar {
+            width: 6px;
+        }
+        #messages::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        #messages::-webkit-scrollbar-thumb {
+            background: var(--border-color);
+            border-radius: 3px;
+        }
+        #messages::-webkit-scrollbar-thumb:hover {
+            background: var(--text-secondary);
         }
 
         .msg {
-            max-width: 85%;
-            padding: 8px 12px;
-            border-radius: 6px;
-            font-size: 13px;
-            line-height: 1.4;
+            max-width: 70%;
+            padding: 12px 16px;
+            border-radius: 16px;
+            font-size: 14px;
+            line-height: 1.5;
             word-wrap: break-word;
+            box-shadow: var(--shadow-sm);
+            position: relative;
+            animation: slideIn 0.2s ease;
+        }
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
         .msg-me { 
             align-self: flex-end; 
-            background: rgba(0, 255, 65, 0.15); 
-            border: 1px solid var(--secondary); 
-            color: #eef;
-            border-bottom-right-radius: 0;
+            background: var(--primary); 
+            color: #fff;
+            border-bottom-right-radius: 4px;
         }
         .msg-peer { 
             align-self: flex-start; 
-            background: rgba(0, 184, 255, 0.15); 
-            border: 1px solid #005f85; 
-            color: #eef;
-            border-bottom-left-radius: 0;
+            background: var(--panel);
+            border: 1px solid var(--border-color);
+            color: var(--text);
+            border-bottom-left-radius: 4px;
+        }
+        .msg-timestamp {
+            font-size: 11px;
+            color: rgba(255, 255, 255, 0.6);
+            margin-top: 4px;
+            text-align: right;
+        }
+        .msg-peer .msg-timestamp {
+            color: var(--text-secondary);
         }
         .sys-msg {
             align-self: center;
-            font-size: 10px;
-            color: #555;
-            background: #111;
-            padding: 2px 8px;
-            border-radius: 10px;
-            border: 1px solid #222;
+            font-size: 12px;
+            color: var(--text-secondary);
+            background: var(--panel);
+            padding: 6px 14px;
+            border-radius: 20px;
+            border: 1px solid var(--border-color);
+            box-shadow: var(--shadow-sm);
         }
 
         /* Chat Input Bar */
         .input-bar {
-            padding: 10px;
-            background: #111;
-            border-top: 1px solid var(--border);
+            padding: 16px 20px;
+            background: var(--panel);
+            border-top: 1px solid var(--border-color);
             display: flex;
-            gap: 8px;
+            gap: 10px;
+            align-items: center;
+            flex-shrink: 0;
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
         }
-        .input-bar input { margin: 0; text-align: left; }
-        .input-bar button { width: auto; padding: 0 15px; }
+        .input-bar input { 
+            margin: 0; 
+            text-align: left;
+            padding: 14px 18px;
+            border-radius: 24px;
+            font-size: 15px;
+        }
+        .input-bar button { 
+            width: 48px;
+            height: 48px;
+            padding: 0;
+            border-radius: 50%;
+            font-size: 18px;
+            flex-shrink: 0;
+        }
+        .input-bar button i {
+            transition: transform 0.2s ease;
+        }
+        .input-bar button:hover i {
+            transform: translateX(2px);
+        }
 
         /* --- 3. FOOTER (CREDITS) --- */
         .footer {
-            background: #080808;
-            border-top: 1px solid var(--border);
-            padding: 10px;
-            font-size: 10px;
-            color: #666;
+            background: var(--panel);
+            border-top: 1px solid var(--border-color);
+            padding: 8px 20px;
+            font-size: 11px;
+            color: var(--text-secondary);
             text-align: center;
             flex-shrink: 0;
-            display: flex;
-            flex-direction: column;
-            gap: 5px;
+            line-height: 1.4;
         }
         .footer strong { color: var(--primary); }
-        .tech-stack { color: var(--accent); font-size: 9px; text-transform: uppercase; margin-top: 2px;}
 
         /* --- MOBILE RESPONSIVENESS --- */
         @media (max-width: 768px) {
-            .main-container { flex-direction: column; height: auto; flex: 1; }
+            .header {
+                padding: 0 12px;
+                height: 56px;
+            }
+            .logo {
+                font-size: 18px;
+            }
+            
+            .main-container { 
+                flex-direction: column;
+            }
             
             .sidebar { 
                 width: 100%; 
-                height: auto; 
-                padding: 10px; 
-                flex-direction: row; 
-                flex-wrap: wrap;
-                gap: 8px;
-                border-bottom: 1px solid var(--border);
-                flex-shrink: 0;
+                max-height: 50vh;
+                padding: 12px; 
+                border-right: none;
+                border-bottom: 1px solid var(--border-color);
+                overflow-y: auto;
             }
             
-            /* Make ID box smaller on mobile */
-            .panel { padding: 8px; flex: 1; min-width: 120px; }
-            .my-id-display { font-size: 22px; padding: 2px; }
-            .panel h3 { display: none; } /* Hide labels on mobile to save space */
+            .panel { 
+                padding: 12px;
+            }
+            .my-id-display { 
+                font-size: 20px; 
+                padding: 10px;
+                letter-spacing: 2px;
+            }
             
-            /* Make buttons big for fingers */
-            .btn-video { padding: 15px; font-size: 14px; }
+            .btn-video { 
+                padding: 16px; 
+                font-size: 16px;
+                min-height: 44px;
+            }
             
-            #video-area .video-grid { height: 160px; }
+            #video-area .video-grid { 
+                min-height: 200px;
+                max-height: 280px;
+            }
             
-            /* Ensure footer text wraps */
-            .footer { height: auto; padding: 10px 5px; }
+            .input-bar {
+                padding: 12px;
+            }
+            .input-bar input {
+                font-size: 16px; /* Prevent zoom on iOS */
+            }
+            .input-bar button {
+                width: 44px;
+                height: 44px;
+                min-width: 44px;
+                min-height: 44px;
+            }
+            
+            .footer { 
+                padding: 6px 12px;
+                font-size: 10px;
+            }
+            
+            .msg {
+                max-width: 85%;
+            }
         }
     </style>
 </head>
 <body>
 
     <div class="header">
-        <div class="logo">GhostLink <span>v4.0</span></div>
-        <div id="connection-status" class="status-badge">Offline</div>
+        <div class="logo">
+            <i class="fa-solid fa-ghost"></i>
+            GhostLink 
+            <span>v4.0</span>
+        </div>
+        <div id="connection-status" class="status-badge">
+            <span class="status-dot"></span>
+            <span id="status-text">Offline</span>
+        </div>
     </div>
 
     <div class="main-container">
@@ -279,19 +545,22 @@
         <div class="sidebar">
             <div class="panel" style="text-align:center;">
                 <h3>Your ID</h3>
-                <div id="my-id" class="my-id-display">...</div>
+                <div id="my-id" class="my-id-display" onclick="copyId()" title="Click to copy">...</div>
+                <div class="copy-hint">👆 Click to copy</div>
             </div>
 
             <div class="panel">
-                <input type="number" id="friend-id" placeholder="Peer ID (4-Digits)">
+                <h3>Connect to Peer</h3>
+                <input type="number" id="friend-id" placeholder="Enter 4-digit Peer ID">
                 <button class="btn-connect" onclick="connectToPeer()">
-                    <i class="fa-solid fa-link"></i> Link
+                    <i class="fa-solid fa-link"></i> Connect
                 </button>
             </div>
 
-            <div class="panel" style="flex: 100%; border:none; background:none; padding:0;">
+            <div class="panel">
+                <h3>Video Call</h3>
                 <button class="btn-video" onclick="startCall()">
-                    <i class="fa-solid fa-video"></i> VIDEO CALL
+                    <i class="fa-solid fa-video"></i> Start Video Call
                 </button>
             </div>
         </div>
@@ -328,11 +597,7 @@
     </div>
 
     <div class="footer">
-        <div>Project Created By <strong>Amit Kumar</strong></div>
-        <div style="color: #555;">Shaheed Udham Singh Govt College, Indri Karnal</div>
-        <div class="tech-stack">
-            Tech Used: HTML5 • CSS3 • JS • WebRTC • PeerJS
-        </div>
+        Created by <strong>Amit Kumar</strong> • HTML5 • CSS3 • JavaScript • WebRTC • PeerJS
     </div>
 
     <script>
@@ -353,6 +618,7 @@
         const ui = {
             idDisplay: document.getElementById('my-id'),
             statusBadge: document.getElementById('connection-status'),
+            statusText: document.getElementById('status-text'),
             msgs: document.getElementById('messages'),
             videoArea: document.getElementById('video-area'),
             localVid: document.getElementById('local-video'),
@@ -364,7 +630,7 @@
         // --- PEER EVENTS ---
         peer.on('open', (id) => {
             ui.idDisplay.innerText = id;
-            ui.statusBadge.innerText = "Online";
+            ui.statusText.innerText = "Online";
             ui.statusBadge.classList.add('online');
             logSystem("Your ID is " + id);
         });
@@ -389,6 +655,21 @@
 
         // --- FUNCTIONS ---
 
+        function copyId() {
+            const id = ui.idDisplay.innerText;
+            if (id !== '...') {
+                navigator.clipboard.writeText(id).then(() => {
+                    const originalText = ui.idDisplay.innerText;
+                    ui.idDisplay.innerText = '✓ Copied!';
+                    setTimeout(() => {
+                        ui.idDisplay.innerText = originalText;
+                    }, 1000);
+                }).catch(() => {
+                    alert('Failed to copy ID: ' + id);
+                });
+            }
+        }
+
         function connectToPeer() {
             const targetId = document.getElementById('friend-id').value;
             if(targetId.length !== 4) return alert("Enter 4-digit ID");
@@ -401,19 +682,19 @@
             conn = c;
             c.on('open', () => {
                 logSystem("Connected to " + c.peer);
-                ui.statusBadge.innerText = "Linked: " + c.peer;
+                ui.statusText.innerText = "Connected: " + c.peer;
             });
             c.on('data', (data) => addMessage(data, 'peer'));
             c.on('close', () => {
                 logSystem("Connection Lost.");
-                ui.statusBadge.innerText = "Online";
+                ui.statusText.innerText = "Online";
                 endCall();
             });
         }
 
         function sendMessage() {
             const input = document.getElementById('msg-input');
-            const text = input.value;
+            const text = input.value.trim();
             if(!text) return;
             if(conn && conn.open) {
                 conn.send(text);
@@ -486,7 +767,16 @@
         function addMessage(text, type) {
             const div = document.createElement('div');
             div.className = type === 'me' ? 'msg msg-me' : 'msg msg-peer';
-            div.innerText = text;
+            
+            const textNode = document.createTextNode(text);
+            div.appendChild(textNode);
+            
+            // Add timestamp
+            const timestamp = document.createElement('div');
+            timestamp.className = 'msg-timestamp';
+            timestamp.innerText = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            div.appendChild(timestamp);
+            
             ui.msgs.appendChild(div);
             ui.msgs.scrollTop = ui.msgs.scrollHeight;
         }
@@ -500,7 +790,10 @@
         }
 
         function handleEnter(e) {
-            if(e.key === 'Enter') sendMessage();
+            if(e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                sendMessage();
+            }
         }
     </script>
 </body>
