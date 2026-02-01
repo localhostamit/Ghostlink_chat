@@ -1,39 +1,32 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
-    <meta name="theme-color" content="#6366f1">
-    <meta name="description" content="GhostLink - Private peer-to-peer encrypted messaging">
-    <title>GhostLink | Secure Chat</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>GhostLink | Secure P2P</title>
     <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css"/>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
-        /* [PREVIOUS CSS REMAINS THE SAME - ADDING ONLY NEW STYLES BELOW] */
         :root {
-            --ghost-purple: #6366f1;
-            --bg-dark: #0a0a0f;
-            --bg-chat: #0d0d14;
-            --panel-bg-dark: #12121a;
-            --panel-secondary: #1a1a24;
-            --border-dark: #2a2a38;
+            --bg-dark: #0f172a;
+            --bg-panel: rgba(30, 41, 59, 0.7);
             --primary: #6366f1;
-            --primary-light: rgba(99, 102, 241, 0.15);
-            --text-main: #f0f0f5;
-            --text-muted: #8b8ba0;
-            --gradient-header: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
-            --gradient-primary: linear-gradient(135deg, #6366f1 0%, #818cf8 100%);
+            --primary-glow: rgba(99, 102, 241, 0.4);
+            --accent: #f43f5e; /* Red for Ghost Mode */
+            --text-main: #f1f5f9;
+            --text-muted: #94a3b8;
+            --border: rgba(255, 255, 255, 0.08);
+            --glass: blur(12px);
         }
 
-        /* Reset & Basics */
-        * { margin:0; padding:0; box-sizing:border-box; }
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
         body {
             font-family: 'Inter', sans-serif;
             background-color: var(--bg-dark);
+            background-image: radial-gradient(circle at 10% 20%, rgba(99, 102, 241, 0.1) 0%, transparent 40%);
             color: var(--text-main);
             height: 100vh;
             display: flex;
@@ -41,558 +34,446 @@
             overflow: hidden;
         }
 
-        /* --- UTILITY CLASSES --- */
-        .hidden { display: none !important; }
-
-        /* --- HEADER --- */
-        .header {
-            padding: 0 16px;
-            background: var(--gradient-header);
+        /* --- Header --- */
+        header {
+            height: 60px;
+            padding: 0 20px;
             display: flex;
-            justify-content: space-between;
             align-items: center;
-            height: 56px;
-            flex-shrink: 0;
-            border-bottom: 1px solid var(--border-dark);
+            justify-content: space-between;
+            border-bottom: 1px solid var(--border);
+            background: rgba(15, 23, 42, 0.8);
+            backdrop-filter: var(--glass);
+            z-index: 10;
         }
-        .logo { font-weight: 700; display: flex; align-items: center; gap: 10px; color: white; }
-        .logo i { font-size: 20px; }
+
+        .brand { font-weight: 600; font-size: 18px; display: flex; align-items: center; gap: 10px; letter-spacing: -0.5px; }
+        .brand i { color: var(--primary); }
         
-        /* --- LAYOUT --- */
-        .main-container { display: flex; flex: 1; overflow: hidden; position: relative; }
-        
+        .status-pill {
+            font-size: 12px;
+            padding: 4px 12px;
+            border-radius: 20px;
+            background: rgba(255,255,255,0.05);
+            color: var(--text-muted);
+            border: 1px solid var(--border);
+            transition: all 0.3s;
+        }
+        .status-pill.online { color: #4ade80; border-color: rgba(74, 222, 128, 0.2); background: rgba(74, 222, 128, 0.1); }
+
+        /* --- Main Layout --- */
+        .container { display: flex; flex: 1; overflow: hidden; }
+
+        /* Sidebar */
         .sidebar {
-            width: 320px;
-            background: var(--panel-bg-dark);
-            border-right: 1px solid var(--border-dark);
-            padding: 16px;
+            width: 300px;
+            background: var(--bg-panel);
+            border-right: 1px solid var(--border);
+            padding: 20px;
             display: flex;
             flex-direction: column;
-            gap: 14px;
-            overflow-y: auto;
-            flex-shrink: 0;
-            transition: transform 0.3s ease;
+            gap: 20px;
+            backdrop-filter: var(--glass);
         }
 
-        .panel {
-            background: var(--panel-secondary);
-            border: 1px solid var(--border-dark);
+        .card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border);
+            border-radius: 16px;
             padding: 16px;
+        }
+
+        h3 { font-size: 12px; text-transform: uppercase; color: var(--text-muted); margin-bottom: 12px; letter-spacing: 1px; }
+
+        .id-display {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 28px;
+            font-weight: 600;
+            color: var(--primary);
+            text-align: center;
+            padding: 10px;
+            background: rgba(99, 102, 241, 0.1);
             border-radius: 12px;
-            margin-bottom: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+            position: relative;
         }
-        .panel h3 { 
-            font-size: 11px; color: var(--text-muted); text-transform: uppercase; 
-            margin-bottom: 12px; font-weight: 600; display: flex; align-items: center; gap: 6px;
-        }
-
-        /* --- SPECIFIC UI ELEMENTS --- */
-        .my-id-display {
-            font-size: 24px; color: var(--primary); text-align: center; font-weight: 700;
-            padding: 12px; background: var(--primary-light); border: 2px solid var(--primary);
-            border-radius: 12px; letter-spacing: 2px; font-family: 'JetBrains Mono', monospace;
-            cursor: pointer; margin-top: 8px;
-        }
-
+        .id-display:hover { background: rgba(99, 102, 241, 0.2); }
+        .id-display:active { transform: scale(0.98); }
+        
         input {
-            width: 100%; padding: 12px; background: var(--bg-dark); border: 1px solid var(--border-dark);
-            color: var(--text-main); border-radius: 8px; margin-bottom: 10px;
+            width: 100%;
+            background: rgba(0,0,0,0.3);
+            border: 1px solid var(--border);
+            padding: 12px;
+            border-radius: 10px;
+            color: white;
+            font-family: 'Inter', sans-serif;
+            margin-bottom: 10px;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+        input:focus { border-color: var(--primary); }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            border-radius: 10px;
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
         }
         
-        button {
-            width: 100%; padding: 12px; border: none; cursor: pointer; border-radius: 8px;
-            font-weight: 600; display: flex; align-items: center; justify-content: center; gap: 8px;
-            transition: transform 0.1s;
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+            box-shadow: 0 4px 15px var(--primary-glow);
         }
-        button:active { transform: scale(0.98); }
-        .btn-connect { background: var(--gradient-primary); color: white; }
-        .btn-grey { background: var(--panel-secondary); color: var(--text-main); border: 1px solid var(--border-dark); }
-        .btn-add-contact {
-            background: transparent; border: 1px dashed var(--border-dark); color: var(--text-muted);
-            margin-top: 8px; padding: 8px; font-size: 13px;
-        }
-        .btn-add-contact:hover { border-color: var(--primary); color: var(--primary); }
-
-        /* Contacts List */
-        .contact-item {
-            display: flex; align-items: center; gap: 12px; padding: 10px;
-            border-radius: 8px; cursor: pointer; transition: background 0.2s;
-            border-bottom: 1px solid rgba(255,255,255,0.05);
-        }
-        .contact-item:hover { background: var(--primary-light); }
-        .contact-avatar {
-            width: 36px; height: 36px; border-radius: 50%; background: var(--gradient-primary);
-            display: flex; align-items: center; justify-content: center; font-weight: 600; color: white;
-        }
-        .contact-info { flex: 1; overflow: hidden; }
-        .contact-name { font-size: 14px; font-weight: 600; }
-        .contact-sub { font-size: 11px; color: var(--text-muted); }
+        .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 6px 20px var(--primary-glow); }
+        .btn-primary:active { transform: translateY(0); }
 
         /* Chat Area */
-        .chat-section { flex: 1; display: flex; flex-direction: column; background: var(--bg-chat); }
-        #messages { flex: 1; overflow-y: auto; padding: 16px; display: flex; flex-direction: column; gap: 8px; }
-        
-        .msg { padding: 8px 12px; border-radius: 8px; max-width: 75%; word-wrap: break-word; font-size: 14px; }
-        .msg-me { align-self: flex-end; background: var(--primary); color: white; border-bottom-right-radius: 2px; }
-        .msg-peer { align-self: flex-start; background: var(--panel-secondary); color: white; border-bottom-left-radius: 2px; }
-        
-        .input-bar { padding: 12px; background: var(--panel-bg-dark); display: flex; gap: 10px; border-top: 1px solid var(--border-dark); }
-        .input-bar input { margin: 0; }
-        .input-bar button { width: 48px; }
+        .chat-area {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background: rgba(0,0,0,0.2);
+            position: relative;
+        }
 
-        /* Modals */
-        .modal-overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.85); z-index: 1000; display: flex;
-            align-items: center; justify-content: center; backdrop-filter: blur(5px);
+        .messages {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
         }
-        .modal-box {
-            background: var(--panel-bg-dark); padding: 24px; border-radius: 16px;
-            width: 90%; max-width: 400px; border: 1px solid var(--border-dark);
-            animation: slideUp 0.3s ease;
+
+        .msg {
+            max-width: 70%;
+            padding: 10px 16px;
+            border-radius: 14px;
+            font-size: 14px;
+            line-height: 1.5;
+            position: relative;
+            animation: fadeIn 0.3s ease;
         }
-        @keyframes slideUp { from {transform: translateY(20px); opacity: 0;} to {transform: translateY(0); opacity: 1;} }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        .msg.me { align-self: flex-end; background: var(--primary); color: white; border-bottom-right-radius: 2px; }
+        .msg.peer { align-self: flex-start; background: rgba(255,255,255,0.1); border-bottom-left-radius: 2px; }
         
-        .setup-option {
-            padding: 16px; border: 2px solid var(--border-dark); border-radius: 12px;
-            margin-bottom: 12px; cursor: pointer; transition: all 0.2s;
+        .sys-msg {
+            align-self: center;
+            font-size: 11px;
+            color: var(--text-muted);
+            background: rgba(255,255,255,0.05);
+            padding: 4px 12px;
+            border-radius: 20px;
         }
-        .setup-option:hover, .setup-option.selected { border-color: var(--primary); background: var(--primary-light); }
-        .setup-option h4 { margin-bottom: 4px; display: flex; align-items: center; gap: 8px; }
+
+        /* Ghost Message Styles */
+        .msg.ghost {
+            border: 1px solid var(--accent);
+        }
+        .msg.ghost::before {
+            content: '🔥 Self-destructing';
+            display: block;
+            font-size: 9px;
+            opacity: 0.7;
+            margin-bottom: 4px;
+            text-transform: uppercase;
+            font-weight: 700;
+        }
+        .progress-bar {
+            height: 2px;
+            background: var(--accent);
+            width: 100%;
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            border-radius: 0 0 14px 14px;
+            animation: burn 10s linear forwards;
+        }
+        @keyframes burn { from { width: 100%; } to { width: 0%; } }
+
+        /* Input Bar */
+        .input-area {
+            padding: 16px;
+            background: var(--bg-panel);
+            backdrop-filter: var(--glass);
+            border-top: 1px solid var(--border);
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
         
-        /* Mobile */
+        .ghost-toggle {
+            width: 44px;
+            height: 44px;
+            border-radius: 10px;
+            background: rgba(255,255,255,0.05);
+            color: var(--text-muted);
+            border: 1px solid var(--border);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            transition: all 0.3s;
+        }
+        .ghost-toggle.active {
+            color: var(--accent);
+            border-color: var(--accent);
+            background: rgba(244, 63, 94, 0.1);
+            box-shadow: 0 0 15px rgba(244, 63, 94, 0.2);
+        }
+
+        /* Toast Notification */
+        .toast {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(15, 23, 42, 0.9);
+            padding: 10px 20px;
+            border-radius: 30px;
+            border: 1px solid var(--border);
+            backdrop-filter: blur(8px);
+            font-size: 13px;
+            opacity: 0;
+            transition: opacity 0.3s;
+            pointer-events: none;
+            z-index: 100;
+        }
+        .toast.show { opacity: 1; }
+
+        /* Mobile Responsive */
         @media (max-width: 768px) {
-            .sidebar { position: absolute; height: 100%; z-index: 100; transform: translateX(-100%); width: 100%; }
-            .sidebar.open { transform: translateX(0); }
-            .mobile-menu-btn { display: block; background: transparent; color: white; font-size: 20px; border: none; }
+            .container { flex-direction: column; }
+            .sidebar { 
+                width: 100%; 
+                padding: 12px;
+                gap: 10px;
+                border-bottom: 1px solid var(--border);
+                border-right: none;
+            }
+            .card { padding: 12px; display: flex; align-items: center; gap: 10px; justify-content: space-between; }
+            h3 { display: none; }
+            .id-display { font-size: 20px; padding: 6px; }
+            .sidebar input { margin: 0; width: 100px; font-size: 12px; padding: 8px; }
+            .sidebar button { width: auto; font-size: 12px; padding: 8px 16px; }
         }
-        @media (min-width: 769px) { .mobile-menu-btn { display: none; } }
     </style>
 </head>
 <body>
 
-    <div id="setup-modal" class="modal-overlay">
-        <div class="modal-box">
-            <h2 style="margin-bottom: 8px;"><i class="fa-solid fa-ghost"></i> GhostLink</h2>
-            <p style="color: var(--text-muted); margin-bottom: 20px; font-size: 14px;">Choose your privacy level:</p>
-            
-            <div class="setup-option" onclick="selectMode('guest')" id="opt-guest">
-                <h4><i class="fa-solid fa-user-secret"></i> Guest Mode</h4>
-                <p style="font-size: 12px; color: var(--text-muted);">No history. Instant random ID. Connect via ID manually.</p>
-            </div>
-            
-            <div class="setup-option" onclick="selectMode('persistent')" id="opt-persistent">
-                <h4><i class="fa-solid fa-save"></i> Save Chats</h4>
-                <p style="font-size: 12px; color: var(--text-muted);">Keeps history & contacts. Persistent ID. WhatsApp style.</p>
-            </div>
-
-            <div id="username-input-area" class="hidden" style="margin-top: 16px;">
-                <label style="font-size: 12px; color: var(--text-muted);">Choose Username</label>
-                <input type="text" id="setup-username" placeholder="e.g. CyberWolf" maxlength="15">
-            </div>
-
-            <button onclick="finishSetup()" class="btn-connect" style="margin-top: 16px;">Start Messaging</button>
+    <header>
+        <div class="brand">
+            <i class="fa-solid fa-ghost"></i> GhostLink
         </div>
-    </div>
+        <div id="status" class="status-pill">Offline</div>
+    </header>
 
-    <div id="add-contact-modal" class="modal-overlay hidden">
-        <div class="modal-box">
-            <h3>Add New Contact</h3>
-            <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 12px;">Enter their 4-digit Ghost ID to start.</p>
-            <input type="number" id="new-contact-id" placeholder="Ex: 4821" pattern="[0-9]*">
-            <div style="display: flex; gap: 10px;">
-                <button class="btn-grey" onclick="closeContactModal()">Cancel</button>
-                <button class="btn-connect" onclick="addNewContact()">Add & Chat</button>
-            </div>
-        </div>
-    </div>
-
-    <div class="header">
-        <div class="logo">
-            <button class="mobile-menu-btn" onclick="toggleSidebar()"><i class="fa-solid fa-bars"></i></button>
-            <span><i class="fa-solid fa-ghost"></i> GhostLink</span>
-        </div>
-        <div style="font-size: 12px; color: rgba(255,255,255,0.7);" id="status-indicator">Offline</div>
-    </div>
-
-    <div class="main-container">
-        <div class="sidebar" id="sidebar">
-            <div class="panel">
-                <h3><i class="fa-solid fa-id-card"></i> Your Profile</h3>
-                <div style="text-align: center;">
-                    <div style="font-size: 18px; font-weight: 600;" id="display-username">Guest</div>
-                    <div id="my-id-box" class="my-id-display" onclick="copyId()">....</div>
-                    <div style="font-size: 10px; color: var(--text-muted); margin-top: 6px;">Tap ID to Copy</div>
+    <div class="container">
+        <div class="sidebar">
+            <div class="card">
+                <div style="flex:1;">
+                    <h3>My Identity</h3>
+                    <div id="my-id" class="id-display" onclick="copyId()">....</div>
                 </div>
             </div>
 
-            <div id="guest-connect-panel" class="panel">
-                <h3><i class="fa-solid fa-bolt"></i> Instant Connect</h3>
-                <input type="number" id="guest-target-id" placeholder="Enter Peer ID" inputmode="numeric">
-                <button class="btn-connect" onclick="guestConnect()">Connect</button>
-            </div>
-
-            <div id="saved-contacts-panel" class="panel hidden">
-                <h3 style="justify-content: space-between;">
-                    <span><i class="fa-solid fa-address-book"></i> Chats</span>
-                </h3>
-                <div id="contacts-list" style="max-height: 300px; overflow-y: auto;">
-                    </div>
-                <button class="btn-add-contact" onclick="openContactModal()">
-                    <i class="fa-solid fa-plus"></i> Start New Chat
-                </button>
-            </div>
-
-            <div class="panel">
-                <button class="btn-grey" onclick="resetApp()" style="font-size: 12px; padding: 8px;">
-                    <i class="fa-solid fa-rotate-right"></i> Reset / Change Mode
-                </button>
+            <div class="card">
+                <div style="flex:1; display:flex; gap: 8px; align-items: center;">
+                    <input type="number" id="target-id" placeholder="Peer ID (4 digits)" maxlength="4">
+                    <button class="btn-primary" onclick="connectToPeer()">
+                        <i class="fa-solid fa-link"></i> <span class="mobile-hide">Connect</span>
+                    </button>
+                </div>
             </div>
         </div>
 
-        <div class="chat-section">
-            <div id="messages">
-                <div style="align-self: center; background: rgba(255,255,255,0.05); padding: 8px 16px; border-radius: 20px; font-size: 12px; color: var(--text-muted);">
-                    Messages are end-to-end encrypted.
-                </div>
+        <div class="chat-area">
+            <div class="messages" id="msg-container">
+                <div class="sys-msg">🔒 Connection is P2P & End-to-End Encrypted</div>
+                <div class="sys-msg">❌ No data is saved. Refreshing clears everything.</div>
             </div>
-            <div class="input-bar">
+
+            <div class="input-area">
+                <button id="ghost-btn" class="ghost-toggle" onclick="toggleGhostMode()" title="Ghost Mode: Auto-delete in 10s">
+                    <i class="fa-solid fa-fire"></i>
+                </button>
                 <input type="text" id="msg-input" placeholder="Type a message..." onkeypress="handleEnter(event)">
-                <button class="btn-connect" onclick="sendMessage()"><i class="fa-solid fa-paper-plane"></i></button>
+                <button class="btn-primary" style="width: 50px;" onclick="sendMessage()">
+                    <i class="fa-solid fa-paper-plane"></i>
+                </button>
             </div>
         </div>
     </div>
+
+    <div id="toast" class="toast">Notification</div>
 
     <script>
-        // --- CONFIG & STATE ---
+        // --- State Management ---
         let peer;
         let conn;
         let myId;
-        let myUsername = "Guest";
-        let currentMode = "guest"; // 'guest' or 'persistent'
-        let savedContacts = [];
-        let chatHistory = {};
-
-        // --- FAST INITIALIZATION ---
-        // Generate ID immediately to make it feel instant
-        function generateId() {
-            return Math.floor(Math.random() * 9000 + 1000).toString();
-        }
-
-        // On Load Logic
+        let ghostMode = false;
+        
+        // --- Initialization ---
         window.addEventListener('load', () => {
-            const savedMode = localStorage.getItem('ghostlink-mode');
-            if (savedMode) {
-                // Restore session immediately
-                document.getElementById('setup-modal').classList.add('hidden');
-                currentMode = savedMode;
-                if (currentMode === 'persistent') {
-                    myId = localStorage.getItem('ghostlink-id') || generateId(); // Reuse ID
-                    myUsername = localStorage.getItem('ghostlink-username');
-                    savedContacts = JSON.parse(localStorage.getItem('ghostlink-contacts') || "[]");
-                    chatHistory = JSON.parse(localStorage.getItem('ghostlink-chats') || "{}");
-                } else {
-                    myId = generateId(); // New ID every time for Guest
-                }
-                initPeer(myId);
-                updateUI();
-            } else {
-                // First time user
-                myId = generateId();
-            }
-        });
+            // 1. Generate ID instantly (4 Digits)
+            myId = Math.floor(Math.random() * 9000 + 1000).toString();
+            document.getElementById('my-id').innerText = myId;
 
-        // --- PEERJS SETUP ---
-        function initPeer(id) {
-            document.getElementById('my-id-box').innerText = id;
-            
-            // Initialize PeerJS with the pre-generated ID
-            peer = new Peer(id, {
+            // 2. Initialize PeerJS
+            peer = new Peer(myId, {
                 debug: 0,
                 config: { iceServers: [{ urls: 'stun:stun.l.google.com:19302' }] }
             });
 
             peer.on('open', (id) => {
-                document.getElementById('status-indicator').innerText = "Online";
-                document.getElementById('status-indicator').style.color = "#4ade80";
-                // If in persistent mode, save this ID forever
-                if (currentMode === 'persistent') {
-                    localStorage.setItem('ghostlink-id', id);
-                }
+                setStatus('Online', true);
             });
 
             peer.on('connection', (c) => {
                 handleConnection(c);
             });
-            
+
             peer.on('error', (err) => {
-                if(err.type === 'unavailable-id') {
-                    // Extremely rare collision, regenerate
-                    myId = generateId();
-                    initPeer(myId);
-                } else {
-                    console.log(err);
-                }
+                showToast("Connection Error: " + err.type);
             });
+        });
+
+        // --- Connection Logic ---
+        function connectToPeer() {
+            const targetId = document.getElementById('target-id').value;
+            if (targetId.length !== 4) return showToast("Enter a valid 4-digit ID");
+            if (targetId === myId) return showToast("You cannot connect to yourself");
+
+            setStatus('Connecting...');
+            conn = peer.connect(targetId);
+            handleConnection(conn);
         }
 
         function handleConnection(c) {
             conn = c;
-            
-            c.on('open', () => {
-                // Exchange Usernames
-                conn.send({ type: 'info', username: myUsername });
-                document.getElementById('status-indicator').innerText = "Connected";
-                
-                // If in Saved Mode, ensure contact is saved
-                if (currentMode === 'persistent') {
-                    // We wait for their info
-                }
-            });
 
-            c.on('data', (data) => {
-                if (data.type === 'info') {
-                    // Update header or contact list
-                    updateContactName(c.peer, data.username);
-                    systemMsg(`${data.username} connected`);
-                } else {
-                    // Chat Message
-                    addMessage(data.text, 'peer');
-                    if(currentMode === 'persistent') saveChat(c.peer, data.text, 'peer');
-                }
-            });
-            
-            c.on('close', () => {
-                systemMsg("Peer disconnected");
-                document.getElementById('status-indicator').innerText = "Online";
-            });
-        }
-
-        // --- UI LOGIC ---
-
-        function selectMode(mode) {
-            document.querySelectorAll('.setup-option').forEach(el => el.classList.remove('selected'));
-            document.getElementById('opt-' + mode).classList.add('selected');
-            
-            const userArea = document.getElementById('username-input-area');
-            if(mode === 'persistent') {
-                userArea.classList.remove('hidden');
-                document.getElementById('setup-username').focus();
-            } else {
-                userArea.classList.add('hidden');
-            }
-        }
-
-        function finishSetup() {
-            const guestSelected = document.getElementById('opt-guest').classList.contains('selected');
-            const persistentSelected = document.getElementById('opt-persistent').classList.contains('selected');
-            
-            if(!guestSelected && !persistentSelected) return alert("Select a mode");
-
-            if (persistentSelected) {
-                const name = document.getElementById('setup-username').value.trim();
-                if(name.length < 3) return alert("Username too short");
-                
-                currentMode = 'persistent';
-                myUsername = name;
-                // Persistent Mode: Use specific ID storage
-                localStorage.setItem('ghostlink-mode', 'persistent');
-                localStorage.setItem('ghostlink-username', name);
-                // ID is saved in initPeer
-            } else {
-                currentMode = 'guest';
-                localStorage.setItem('ghostlink-mode', 'guest');
-            }
-
-            document.getElementById('setup-modal').classList.add('hidden');
-            initPeer(myId); // Start PeerJS
-            updateUI();
-        }
-
-        function updateUI() {
-            document.getElementById('display-username').innerText = '@' + myUsername;
-            
-            if (currentMode === 'persistent') {
-                // SAVED MODE: Hide direct connect, show contacts
-                document.getElementById('guest-connect-panel').classList.add('hidden');
-                document.getElementById('saved-contacts-panel').classList.remove('hidden');
-                renderContacts();
-            } else {
-                // GUEST MODE: Show direct connect, hide contacts
-                document.getElementById('guest-connect-panel').classList.remove('hidden');
-                document.getElementById('saved-contacts-panel').classList.add('hidden');
-            }
-        }
-
-        // --- SAVED MODE: CONTACTS LOGIC ---
-        
-        function openContactModal() {
-            document.getElementById('add-contact-modal').classList.remove('hidden');
-            document.getElementById('new-contact-id').focus();
-        }
-        
-        function closeContactModal() {
-            document.getElementById('add-contact-modal').classList.add('hidden');
-        }
-
-        function addNewContact() {
-            const id = document.getElementById('new-contact-id').value;
-            if(id.length !== 4) return alert("Invalid ID");
-            
-            // Add to list
-            const existing = savedContacts.find(c => c.id === id);
-            if (!existing) {
-                savedContacts.push({ id: id, name: "ID: " + id }); // Name updates on connect
-                localStorage.setItem('ghostlink-contacts', JSON.stringify(savedContacts));
-                renderContacts();
-            }
-            
-            closeContactModal();
-            connectTo(id);
-        }
-
-        function renderContacts() {
-            const list = document.getElementById('contacts-list');
-            list.innerHTML = "";
-            
-            if(savedContacts.length === 0) {
-                list.innerHTML = `<div style="padding:10px; color:var(--text-muted); font-size:12px; text-align:center;">No contacts yet. Click + to add.</div>`;
-                return;
-            }
-
-            savedContacts.forEach(c => {
-                const div = document.createElement('div');
-                div.className = 'contact-item';
-                div.innerHTML = `
-                    <div class="contact-avatar">${c.name.charAt(0).toUpperCase()}</div>
-                    <div class="contact-info">
-                        <div class="contact-name">${c.name}</div>
-                        <div class="contact-sub">ID: ${c.id}</div>
-                    </div>
-                `;
-                div.onclick = () => connectTo(c.id);
-                list.appendChild(div);
-            });
-        }
-
-        function updateContactName(id, newName) {
-            if(currentMode !== 'persistent') return;
-            const contact = savedContacts.find(c => c.id === id);
-            if(contact) {
-                contact.name = newName;
-            } else {
-                savedContacts.push({ id: id, name: newName });
-            }
-            localStorage.setItem('ghostlink-contacts', JSON.stringify(savedContacts));
-            renderContacts();
-        }
-
-        function saveChat(peerId, text, type) {
-            if(!chatHistory[peerId]) chatHistory[peerId] = [];
-            chatHistory[peerId].push({ text, type, ts: Date.now() });
-            localStorage.setItem('ghostlink-chats', JSON.stringify(chatHistory));
-        }
-
-        function loadHistory(peerId) {
-            document.getElementById('messages').innerHTML = ""; // Clear view
-            if(chatHistory[peerId]) {
-                chatHistory[peerId].forEach(msg => {
-                    addMessage(msg.text, msg.type);
-                });
-            }
-            systemMsg("Chat history loaded");
-        }
-
-        // --- CONNECTION LOGIC ---
-
-        function guestConnect() {
-            const id = document.getElementById('guest-target-id').value;
-            connectTo(id);
-        }
-
-        function connectTo(id) {
-            if(!id) return alert("Enter ID");
-            if(id === myId) return alert("Cannot connect to self");
-            
-            if(currentMode === 'persistent') loadHistory(id);
-            else document.getElementById('messages').innerHTML = "";
-
-            systemMsg(`Connecting to ${id}...`);
-            conn = peer.connect(id);
-            
             conn.on('open', () => {
-                document.getElementById('status-indicator').innerText = "Connected";
-                conn.send({ type: 'info', username: myUsername });
-                
-                // On mobile, close sidebar automatically
-                if(window.innerWidth <= 768) toggleSidebar();
+                setStatus('Connected', true);
+                addSystemMsg(`Connected to ${conn.peer}`);
+                document.getElementById('target-id').value = ""; // Clear input
             });
 
             conn.on('data', (data) => {
-                 if (data.type === 'info') {
-                    updateContactName(conn.peer, data.username);
-                    systemMsg(`${data.username} connected`);
-                } else {
-                    addMessage(data.text, 'peer');
-                    if(currentMode === 'persistent') saveChat(conn.peer, data.text, 'peer');
-                }
+                // data = { text: "hello", ghost: true/false }
+                receiveMessage(data);
             });
-            
-            conn.on('close', () => { systemMsg("Disconnected"); });
+
+            conn.on('close', () => {
+                setStatus('Online', true);
+                addSystemMsg("Peer disconnected");
+                conn = null;
+            });
         }
 
-        // --- MESSAGING ---
-
+        // --- Messaging Logic ---
         function sendMessage() {
             const input = document.getElementById('msg-input');
             const text = input.value.trim();
-            if(!text) return;
-            
-            if(conn && conn.open) {
-                conn.send({ type: 'chat', text: text });
-                addMessage(text, 'me');
-                if(currentMode === 'persistent') saveChat(conn.peer, text, 'me');
+            if (!text) return;
+
+            if (conn && conn.open) {
+                // Send payload
+                const payload = { text: text, ghost: ghostMode };
+                conn.send(payload);
+
+                // Display on my screen
+                addMessage(text, 'me', ghostMode);
                 input.value = '';
             } else {
-                alert("Not connected");
+                showToast("Not connected to anyone!");
             }
         }
 
-        function addMessage(text, type) {
+        function receiveMessage(data) {
+            addMessage(data.text, 'peer', data.ghost);
+        }
+
+        function addMessage(text, type, isGhost) {
+            const container = document.getElementById('msg-container');
+            const msgDiv = document.createElement('div');
+            
+            msgDiv.className = `msg ${type} ${isGhost ? 'ghost' : ''}`;
+            msgDiv.innerText = text;
+
+            // If it's a ghost message, add the self-destruct bar
+            if (isGhost) {
+                const bar = document.createElement('div');
+                bar.className = 'progress-bar';
+                msgDiv.appendChild(bar);
+
+                // Remove from DOM after 10 seconds
+                setTimeout(() => {
+                    msgDiv.style.opacity = '0';
+                    setTimeout(() => msgDiv.remove(), 500); // Wait for fade out
+                }, 10000);
+            }
+
+            container.appendChild(msgDiv);
+            container.scrollTop = container.scrollHeight;
+        }
+
+        function addSystemMsg(text) {
+            const container = document.getElementById('msg-container');
             const div = document.createElement('div');
-            div.className = `msg msg-${type}`;
+            div.className = 'sys-msg';
             div.innerText = text;
-            const container = document.getElementById('messages');
             container.appendChild(div);
             container.scrollTop = container.scrollHeight;
         }
 
-        function systemMsg(text) {
-            const div = document.createElement('div');
-            div.style.cssText = "align-self: center; font-size: 11px; color: var(--text-muted); margin: 4px 0;";
-            div.innerText = text;
-            const container = document.getElementById('messages');
-            container.appendChild(div);
+        // --- UI Interactions ---
+        function toggleGhostMode() {
+            ghostMode = !ghostMode;
+            const btn = document.getElementById('ghost-btn');
+            if (ghostMode) {
+                btn.classList.add('active');
+                showToast("Ghost Mode ON: Messages vanish in 10s");
+            } else {
+                btn.classList.remove('active');
+                showToast("Ghost Mode OFF");
+            }
         }
 
-        function handleEnter(e) { if(e.key === 'Enter') sendMessage(); }
+        function handleEnter(e) {
+            if (e.key === 'Enter') sendMessage();
+        }
 
-        // --- UTILS ---
-        function toggleSidebar() { document.getElementById('sidebar').classList.toggle('open'); }
-        
         function copyId() {
             navigator.clipboard.writeText(myId);
-            const box = document.getElementById('my-id-box');
-            const original = box.innerText;
-            box.innerText = "Copied!";
-            setTimeout(() => box.innerText = original, 1000);
+            showToast("ID Copied to clipboard!");
         }
 
-        function resetApp() {
-            if(confirm("Reset all data and settings?")) {
-                localStorage.clear();
-                location.reload();
-            }
+        function setStatus(text, isGood = false) {
+            const el = document.getElementById('status');
+            el.innerText = text;
+            if (isGood) el.classList.add('online');
+            else el.classList.remove('online');
+        }
+
+        function showToast(msg) {
+            const t = document.getElementById('toast');
+            t.innerText = msg;
+            t.classList.add('show');
+            setTimeout(() => t.classList.remove('show'), 3000);
         }
     </script>
 </body>
