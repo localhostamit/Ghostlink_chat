@@ -37,11 +37,6 @@ You can host this immediately on GitHub Pages, Netlify, or Vercel.
    * Click Connect.
  * Chat: Once the status dot turns green, you can start messaging.
  * Share Media: Click the + (Plus) icon next to the chat bar to send images, videos, or code snippets.
-📸 Screenshots
-| Desktop View | Mobile Sidebar |
-|---|---|
-| (Place screenshot here) | (Place screenshot here) |
-| Deep Aurora Theme | Control Center |
 🤝 Contributing
 Contributions are what make the open-source community such an amazing place to learn, inspire, and create. Any contributions you make are greatly appreciated.
  * Fork the Project.
@@ -55,7 +50,7 @@ Contributions are what make the open-source community such an amazing place to l
  * Ephemeral: Refreshing the page generates a new ID and wipes the chat history.
 👤 Author
 Amit Kumar
- * GitHub: @localhostamit
+ * GitHub:  github.com/localhostamit
  * Project Repo: GhostLink_chat
 📄 License
 Distributed under the MIT License. See LICENSE for more information.
